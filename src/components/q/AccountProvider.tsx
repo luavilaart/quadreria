@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { useRouter } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { t } from '@/i18n/en';
 import type { User } from '@supabase/supabase-js';
 import type { Database, Json } from '@/integrations/supabase/types';
 export type Registration = { role: 'artist' | 'collector'; name: string; handle: string; city: string; mediums: string[]; room: string; bio: string; wants: string[]; links: {label:string;url:string}[] };
@@ -17,4 +16,5 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 }
 export const useAccount=()=>useContext(Context);
 export async function completeRegistration(payload: Registration) { const {error}=await supabase.rpc('complete_registration',{payload:payload as unknown as Json});if(error)throw error; }
-export async function uploadImage(bucket:string,userId:string,file:File) { if(!file.type.startsWith('image/')||file.size>10*1024*1024)throw new Error(t.account.uploadError);const path=`${userId}/${crypto.randomUUID()}.${file.name.split('.').pop()}`;const {error}=await supabase.storage.from(bucket).upload(path,file);if(error)throw error;return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl; }
+/** tooLarge is the message shown when the file is not an image under 10 MB (pass t.account.uploadError). */
+export async function uploadImage(bucket:string,userId:string,file:File,tooLarge:string) { if(!file.type.startsWith('image/')||file.size>10*1024*1024)throw new Error(tooLarge);const path=`${userId}/${crypto.randomUUID()}.${file.name.split('.').pop()}`;const {error}=await supabase.storage.from(bucket).upload(path,file);if(error)throw error;return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl; }

@@ -4,24 +4,25 @@ import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
 import { Wordmark } from "@/components/q/Wordmark";
 import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery, mediums } from "@/lib/gallery";
-import { t } from "@/i18n/en";
+import { copyFor, langOf, useFormat, useT } from "@/i18n";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
-  head: () => ({ meta: [
-    { title: "quadreria — Hire the artist, not the gig." },
-    { name: "description", content: "Walk into artists' rooms. Buy originals and prints, hire artists, and get tickets to their classes and openings." },
-    { property: "og:title", content: "quadreria — Hire the artist, not the gig." },
-    { property: "og:description", content: "An online gallery where every artist has a room." },
+  notFoundComponent: Empty,
+  head: ({ match }) => { const t = copyFor(langOf(match.context)); return { meta: [
+    { title: t.meta.rootTitle },
+    { name: "description", content: t.meta.homeDescription },
+    { property: "og:title", content: t.meta.rootTitle },
+    { property: "og:description", content: t.meta.homeShare },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  ] }; },
   component: Home,
 });
 
 function Home() {
   const { data: { artists, services, events } } = useSuspenseQuery(galleryQuery);
+  const t = useT(); const f = useFormat();
   return (
     <Page>
       <section className="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:pt-24">
@@ -39,12 +40,12 @@ function Home() {
       <section className="mx-auto max-w-6xl px-5">
         <p className="label mb-3 text-stone">{t.home.byMedium}</p>
         <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-2">
-          {mediums.map((m) => <Link key={m} to="/discover" search={{ medium: m }} className="chip hover:border-ink">{m}</Link>)}
+          {mediums.map((m) => <Link key={m} to="/discover" search={{ medium: m }} className="chip hover:border-ink">{f.medium(m)}</Link>)}
         </div>
       </section>
 
       <section className="mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle kicker="Featured" title={t.home.featured} />
+        <SectionTitle kicker={t.home.featuredKicker} title={t.home.featured} />
         <div className="grid gap-4 sm:grid-cols-3">{artists.map((a) => <RoomCard key={a.handle} a={a} />)}</div>
       </section>
 
@@ -56,7 +57,7 @@ function Home() {
       </section>
 
       <section className="mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle title={t.home.thisWeek} action={<Link to="/events" className="link text-sm">All events</Link>} />
+        <SectionTitle title={t.home.thisWeek} action={<Link to="/events" className="link text-sm">{t.home.allEvents}</Link>} />
         <div className="grid gap-3 sm:grid-cols-2">{events.map((e) => <EventCard key={e.id} e={e} />)}</div>
       </section>
 
@@ -76,3 +77,5 @@ function Home() {
     </Page>
   );
 }
+
+function Empty() { return <p>{useT().account.empty}</p>; }

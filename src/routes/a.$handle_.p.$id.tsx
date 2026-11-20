@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Page, SampleBadge } from "@/components/q/Shell";
 import { Art } from "@/components/q/Art";
 import { PieceCard } from "@/components/q/Cards";
-import { galleryQuery, usd } from "@/lib/gallery";
-import { t } from "@/i18n/en";
+import { galleryQuery } from "@/lib/gallery";
+import { copyFor, formatters, langOf, useFormat, useT } from "@/i18n";
 
 export const Route = createFileRoute("/a/$handle_/p/$id")({
   loader: async ({ params, context }) => {
@@ -17,13 +17,13 @@ export const Route = createFileRoute("/a/$handle_/p/$id")({
     return { p, a };
   },
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
-  head: ({ loaderData: d }) => ({ meta: d ? [
-    { title: `${d.p.title} by ${d.a.name} — quadreria` }, { name: "description", content: `${d.p.medium}, ${d.p.size}. ${usd(d.p.price)}.` },
-    { property: "og:title", content: `${d.p.title} — ${d.a.name}` }, { property: "og:description", content: `${d.p.medium} on quadreria` },
+  notFoundComponent: Empty,
+  head: ({ loaderData: d, match }) => { const lang = langOf(match.context); const t = copyFor(lang); const f = formatters(lang); return { meta: d ? [
+    { title: `${t.meta.pieceTitle(d.p.title, d.a.name)} — quadreria` }, { name: "description", content: `${f.medium(d.p.medium)}, ${d.p.size}. ${f.price(d.p.price)}.` },
+    { property: "og:title", content: `${d.p.title} — ${d.a.name}` }, { property: "og:description", content: t.meta.pieceShare(f.medium(d.p.medium)) },
     ...(d.p.images[0]?.startsWith("https://") ? [{property:"og:image",content:d.p.images[0] ?? ""},{name:"twitter:image",content:d.p.images[0] ?? ""}] : []),
     { property: "og:type", content: "product" }, { name: "twitter:card", content: "summary_large_image" },
-  ] : [{ title: "Piece not found — quadreria" }, { name: "robots", content: "noindex" }] }),
+  ] : [{ title: `${t.meta.pieceMissing} — quadreria` }, { name: "robots", content: "noindex" }] }; },
   component: PiecePage,
 });
 
@@ -31,6 +31,7 @@ function PiecePage() {
   useSuspenseQuery(galleryQuery);
   const { p, a } = Route.useLoaderData();
   const { data } = useSuspenseQuery(galleryQuery);
+  const t = useT(); const f = useFormat();
   return (
     <Page>
       <div className="mx-auto grid max-w-6xl gap-10 px-5 pt-8 lg:grid-cols-[3fr_2fr]">
@@ -41,13 +42,13 @@ function PiecePage() {
           {p.sample && <SampleBadge />}
           <Link to="/a/$handle" params={{ handle: a.handle }} className="link mt-4 block text-sm">{a.name}</Link>
           <h1 className="mt-1 text-4xl">{p.title}</h1>
-          <p className="mt-3 text-2xl font-medium">{usd(p.price)}</p>
+          <p className="mt-3 text-2xl font-medium">{f.price(p.price)}</p>
           <dl className="mt-6 divide-y divide-line border-y border-line text-sm">
-            {[[t.piece.medium, p.medium], [t.piece.size, p.size], [t.piece.ships, p.city === "Online" ? "Tegucigalpa, Honduras" : `${p.city}, Honduras`]].map(([k, v]) => (
+            {[[t.piece.medium, f.medium(p.medium)], [t.piece.size, p.size], [t.piece.ships, p.city === "Online" ? "Tegucigalpa, Honduras" : `${p.city}, Honduras`]].map(([k, v]) => (
               <div key={k} className="flex justify-between py-3"><dt className="label text-stone">{k}</dt><dd>{v}</dd></div>
             ))}
           </dl>
-          <p className="mt-4 text-sm text-stone">Packed by the artist and shipped within 5 days. Shipping is calculated at checkout.</p>
+          <p className="mt-4 text-sm text-stone">{t.piece.shipping}</p>
           <QButton disabled className="btn-primary mt-6 w-full">{t.piece.add} · {t.account.coming}</QButton>
         </div>
       </div>
@@ -58,3 +59,5 @@ function PiecePage() {
     </Page>
   );
 }
+
+function Empty() { return <p>{useT().account.empty}</p>; }

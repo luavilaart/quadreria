@@ -3,34 +3,43 @@ import { useState } from "react";
 import { SiteHeader, SiteFooter, SampleBadge } from "@/components/q/Shell";
 import { Art } from "@/components/q/Art";
 import { PieceCard, EventCard } from "@/components/q/Cards";
-import { artistBy, piecesBy, servicesBy, eventsBy } from "@/data/sample";
+import { galleryQuery } from "@/lib/gallery";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createContext, useContext, type ReactNode } from "react";
 import { t } from "@/i18n/en";
 
 export const Route = createFileRoute("/a/$handle")({
-  loader: ({ params }) => { const a = artistBy(params.handle); if (!a) throw notFound(); return a; },
+  loader: async ({ params, context }) => { const data = await context.queryClient.ensureQueryData(galleryQuery); const a = data.artists.find(a => a.handle === params.handle); if (!a) throw notFound(); return a; },
+  errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
+  notFoundComponent: () => <p>{t.account.empty}</p>,
   head: ({ loaderData: a }) => ({ meta: a ? [
     { title: `${a.name}'s room — quadreria` }, { name: "description", content: a.tagline },
     { property: "og:title", content: `${a.name} on quadreria` }, { property: "og:description", content: a.tagline },
+    ...(a.photo?.startsWith("https://") ? [{property:"og:image",content:a.photo},{name:"twitter:image",content:a.photo}] : []),
     { property: "og:type", content: "profile" }, { name: "twitter:card", content: "summary_large_image" },
   ] : [{ title: "Room not found — quadreria" }, { name: "robots", content: "noindex" }] }),
   component: Room,
 });
 
 function Room() {
-  const a = Route.useLoaderData();
-  const work = piecesBy(a.handle);
+  const { handle } = Route.useParams();
+  const { data } = useSuspenseQuery(galleryQuery);
+  const a = data.artists.find(a => a.handle === handle);
+  const work = data.pieces.filter(p => p.artist === handle);
   const collections = ["All", ...new Set(work.map((p) => p.collection))];
   const [col, setCol] = useState("All");
   const [salon, setSalon] = useState(true);
   const shop = work.filter((p) => col === "All" || p.collection === col);
 
+  if (!a) return null;
   return (
+    <RoomSections.Provider value={{ visible: a.visible_sections, order: a.section_order }}>
     <div className={`room-${a.room} bg-room text-room-fg`}>
       <SiteHeader />
       {/* Entrance */}
       <section className="mx-auto grid max-w-6xl items-center gap-8 px-5 pb-16 pt-12 sm:grid-cols-[1fr_auto]">
         <div>
-          <SampleBadge />
+          {a.sample && <SampleBadge />}
           <p className="label mt-6 opacity-70">@{a.handle} · {a.city}</p>
           <h1 className="mt-2 text-5xl leading-none sm:text-7xl">{a.name}</h1>
           <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
@@ -39,10 +48,10 @@ function Room() {
             <a href="#shop" className="btn btn-ghost">{t.room.shop}</a>
           </div>
         </div>
-        <div className="w-40 sm:w-56"><Art ratio={4 / 5} tone="cream" shape={2} title={`${a.name} portrait`} className="rounded-2xl" /></div>
+        <div className="w-40 sm:w-56"><Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={`${a.name} portrait`} className="rounded-2xl" /></div>
       </section>
 
-      <div className="rounded-t-[2rem] bg-room pb-28 sm:pb-0">
+      <div className="flex flex-col rounded-t-[2rem] bg-room pb-28 sm:pb-0">
         <Section id="work" title={t.room.work} action={
           <div className="flex rounded-full border border-current p-0.5 text-xs">
             {[true, false].map((s) => <button key={String(s)} onClick={() => setSalon(s)} className={`rounded-full px-3 py-1 ${salon === s ? "bg-room-fg text-room" : ""}`}>{s ? t.room.salon : t.room.tidy}</button>)}
@@ -51,7 +60,7 @@ function Room() {
             <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-8">
               {work.map((p, i) => (
                 <Link key={p.id} to="/a/$handle/p/$id" params={{ handle: a.handle, id: p.id }} style={{ width: `${[38, 52, 30, 44][i % 4]}%`, marginTop: i % 2 ? 24 : 0 }} className="max-w-xs">
-                  <div className="rounded-lg bg-paper p-2"><Art ratio={p.ratio} tone={p.tone} shape={p.shape} title={p.title} /></div>
+                  <div className="rounded-lg bg-paper p-2"><Art src={p.images[0]} ratio={p.ratio} tone={p.tone} shape={p.shape} title={p.title} /></div>
                 </Link>
               ))}
             </div>
@@ -69,7 +78,7 @@ function Room() {
 
         <Section id="services" title={t.room.services}>
           <div className="grid gap-3 sm:grid-cols-2">
-            {servicesBy(a.handle).map((s) => (
+            {data.services.filter(s => s.artist === handle).map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-4 rounded-2xl bg-card p-5 text-ink">
                 <div><h3 className="text-xl">{s.title}</h3><p className="text-sm text-stone">{s.note}</p></div>
                 <button className="btn btn-primary shrink-0 !px-4 !py-2 text-sm">{s.price}</button>
@@ -79,8 +88,8 @@ function Room() {
         </Section>
 
         <Section id="events" title={t.room.events}>
-          <div className="grid gap-3 text-ink sm:grid-cols-2">{eventsBy(a.handle).map((e) => <EventCard key={e.id} e={e} />)}</div>
-          {eventsBy(a.handle).length === 0 && <p className="opacity-70">No events planned. Check back soon.</p>}
+          <div className="grid gap-3 text-ink sm:grid-cols-2">{data.events.filter(e => e.artist === handle).map((e) => <EventCard key={e.id} e={e} />)}</div>
+          {data.events.filter(e => e.artist === handle).length === 0 && <p className="opacity-70">No events planned. Check back soon.</p>}
         </Section>
 
         <Section id="about" title={t.room.about}>
@@ -125,12 +134,16 @@ function Room() {
       </div>
       <div className="bg-wall text-ink"><SiteFooter /></div>
     </div>
+    </RoomSections.Provider>
   );
 }
 
-function Section({ id, title, action, children }: { id: string; title: string; action?: React.ReactNode; children: React.ReactNode }) {
+const RoomSections = createContext({ visible: [] as string[], order: [] as string[] });
+function Section({ id, title, action, children }: { id: string; title: string; action?: ReactNode; children: ReactNode }) {
+  const { visible, order } = useContext(RoomSections);
+  if (!visible.includes(id)) return null;
   return (
-    <section id={id} className="mx-auto max-w-6xl scroll-mt-20 px-5 py-12">
+    <section style={{order: order.indexOf(id)}} id={id} className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
       <div className="mb-6 flex items-center justify-between"><h2 className="text-3xl">{title}</h2>{action}</div>
       {children}
     </section>

@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as JoinRouteImport } from './routes/join'
-import { Route as StudioRouteImport } from './routes/studio'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AHandleRouteImport } from './routes/a.$handle'
 import { Route as AHandleEIdRouteImport } from './routes/a.$handle_.e.$id'
 import { Route as AHandlePIdRouteImport } from './routes/a.$handle_.p.$id'
@@ -21,6 +25,15 @@ import { Route as AHandlePIdRouteImport } from './routes/a.$handle_.p.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -38,10 +51,20 @@ const JoinRoute = JoinRouteImport.update({
   path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudioRoute = StudioRouteImport.update({
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
+  id: '/my-tickets',
+  path: '/my-tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
   id: '/studio',
   path: '/studio',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AHandleRoute = AHandleRouteImport.update({
   id: '/a/$handle',
@@ -61,20 +84,26 @@ const AHandlePIdRoute = AHandlePIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
-  '/studio': typeof StudioRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/a/$handle/e/$id': typeof AHandleEIdRoute
   '/a/$handle/p/$id': typeof AHandlePIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
-  '/studio': typeof StudioRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/a/$handle/e/$id': typeof AHandleEIdRoute
   '/a/$handle/p/$id': typeof AHandlePIdRoute
@@ -82,10 +111,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
-  '/studio': typeof StudioRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/_authenticated/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/a/$handle_/e/$id': typeof AHandleEIdRoute
   '/a/$handle_/p/$id': typeof AHandlePIdRoute
@@ -94,9 +127,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/discover'
     | '/events'
     | '/join'
+    | '/reset-password'
+    | '/my-tickets'
     | '/studio'
     | '/a/$handle'
     | '/a/$handle/e/$id'
@@ -104,9 +140,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/discover'
     | '/events'
     | '/join'
+    | '/reset-password'
+    | '/my-tickets'
     | '/studio'
     | '/a/$handle'
     | '/a/$handle/e/$id'
@@ -114,10 +153,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/discover'
     | '/events'
     | '/join'
-    | '/studio'
+    | '/reset-password'
+    | '/_authenticated/my-tickets'
+    | '/_authenticated/studio'
     | '/a/$handle'
     | '/a/$handle_/e/$id'
     | '/a/$handle_/p/$id'
@@ -125,10 +168,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
   EventsRoute: typeof EventsRoute
   JoinRoute: typeof JoinRoute
-  StudioRoute: typeof StudioRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   AHandleRoute: typeof AHandleRoute
   AHandleEIdRoute: typeof AHandleEIdRoute
   AHandlePIdRoute: typeof AHandlePIdRoute
@@ -141,6 +186,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -164,12 +223,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/studio': {
-      id: '/studio'
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/my-tickets': {
+      id: '/_authenticated/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
+      preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
       path: '/studio'
       fullPath: '/studio'
-      preLoaderRoute: typeof StudioRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/a/$handle': {
       id: '/a/$handle'
@@ -195,12 +268,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
+  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
   EventsRoute: EventsRoute,
   JoinRoute: JoinRoute,
-  StudioRoute: StudioRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   AHandleRoute: AHandleRoute,
   AHandleEIdRoute: AHandleEIdRoute,
   AHandlePIdRoute: AHandlePIdRoute,

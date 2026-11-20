@@ -31,6 +31,11 @@ use the editor.
 
 <!-- AGENT-MEMORY:BEGIN -->
 - UI copy lives in src/i18n (one object per language) — enables EN/ES switching later.
-- Sample content lives in src/data/sample.ts — will be replaced by Lovable Cloud queries.
+- Public gallery reads use the shared gallery Query and Worker-safe server function; owner edits use the RLS-scoped browser client, so hidden work remains private.
+- Signup photos persist temporarily in IndexedDB across email/Google returns and move to Cloud storage after registration; no account permissions live in browser storage.
+- Gallery buttons use the unstyled design-system variant so existing pill styling remains unchanged.
+- Roles are immutable after transactional registration in user_roles; profiles never carry permissions.
+- Ticket reservation and check-in use database functions with locks and ownership checks, preventing overbooking and browser privilege changes.
+- Protected studio and tickets live under the client-only authenticated layout; public gallery routes remain crawlable.
 - Artist room colors are `.room-<id>` classes setting --room/--room-fg, used via bg-room/text-room-fg — one template, many walls.
 <!-- AGENT-MEMORY:END -->

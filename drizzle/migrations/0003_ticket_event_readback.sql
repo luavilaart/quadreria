@@ -1,0 +1,1 @@
+CREATE POLICY ticket_event_details ON public.events FOR SELECT TO authenticated USING(EXISTS(SELECT 1 FROM public.tickets t WHERE t.event=events.id AND t.collector=auth.uid()));

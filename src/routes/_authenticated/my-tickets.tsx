@@ -1,0 +1,10 @@
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { ticketsQuery } from '@/lib/studio';
+import { Page } from '@/components/q/Shell';
+import { t } from '@/i18n/en';
+import { pageHead } from '@/lib/head';
+import { fmtDate } from '@/lib/gallery';
+import { supabase } from '@/integrations/supabase/client';
+export const Route=createFileRoute('/_authenticated/my-tickets')({beforeLoad:async()=>{const {data:u}=await supabase.auth.getUser();if(!u.user)throw redirect({to:'/auth',search:{next:'/my-tickets'}});const {data:r}=await supabase.from('user_roles').select('role').eq('user_id',u.user.id).maybeSingle();if(r?.role!=='collector')throw redirect({to:'/discover'});},loader:({context})=>context.queryClient.ensureQueryData(ticketsQuery),errorComponent:({error})=><p role="alert">{error instanceof Error ? error.message : String(error)}</p>,notFoundComponent:()=> <p>{t.account.empty}</p>,head:()=>pageHead(t.account.tickets,t.account.ticketsDescription),component:Tickets});
+function Tickets(){const {data}=useSuspenseQuery(ticketsQuery);const c=t.account;return <Page><div className="mx-auto max-w-3xl px-5 pt-10"><h1 className="text-4xl">{c.tickets}</h1><div className="mt-8 space-y-4">{!data.length&&<p className="text-stone">{c.emptyTickets}</p>}{data.map(ticket=><article key={ticket.id} className="rounded-2xl border border-line bg-card p-5"><h2 className="text-2xl">{ticket.events?.title??c.cancelled}</h2>{ticket.events&&<p className="mt-2 text-stone">{fmtDate(ticket.events.date)} · {ticket.events.start_time.slice(0,5)} · {ticket.events.city}</p>}<p className="mt-3 font-medium">{ticket.events?.status==='cancelled'?c.cancelled:ticket.status==='waitlist'?c.waitlistStatus:ticket.status==='checked in'?c.checkedIn:ticket.status==='cancelled'?c.cancelled:c.reservedStatus}</p><p className="mt-3 break-all text-sm text-stone">{ticket.id}</p>{ticket.events?.online_link&&ticket.status!=='waitlist'&&<a href={ticket.events.online_link} className="link mt-3 block">{c.online}</a>}</article>)}</div></div></Page>;}

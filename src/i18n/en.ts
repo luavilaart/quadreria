@@ -1,5 +1,7 @@
+import { accountCopy } from "./accounts";
 // All UI copy lives here so a Spanish file can be added later with the same shape.
 export const en = {
+  account: accountCopy,
   tagline: "Hire the artist, not the gig.",
   sample: "Sample data",
   nav: { discover: "Discover", events: "Events", join: "Join", studio: "Studio" },

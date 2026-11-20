@@ -2,7 +2,8 @@ import type { RoomColor } from "@/data/sample";
 import { cn } from "@/lib/utils";
 
 /** Abstract placeholder artwork at its true aspect ratio (never cropped). */
-export function Art({ ratio, tone, shape, className, title }: { ratio: number; tone: RoomColor; shape: number; className?: string; title?: string }) {
+export function Art({ ratio, tone, shape, className, title, src }: { ratio: number; tone: RoomColor; shape: number; className?: string; title?: string; src?: string | undefined }) {
+  if (src) return <img src={src} alt={title ?? ""} className={cn("block h-auto w-full rounded-md object-contain", className)} />;
   const bg = `var(--room-${tone})`;
   const shapes = [
     <circle key="c" cx="62" cy="40" r="22" fill="var(--tomato)" opacity=".85" />,

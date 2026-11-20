@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1795154536298,
+      "tag": "0000_gallery_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795154819988,
+      "tag": "0001_restrict_gallery_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795155004938,
+      "tag": "0002_revoke_default_write_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795155214381,
+      "tag": "0003_ticket_event_readback",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795155228615,
+      "tag": "0004_nonrecursive_ticket_access",
+      "breakpoints": true
+    }
+  ]
+}

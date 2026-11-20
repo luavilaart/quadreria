@@ -1,12 +1,17 @@
+import { t } from "@/i18n/en";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Page } from "@/components/q/Shell";
 import { PieceCard, RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
-import { artists, pieces, services, events, mediums, cities } from "@/data/sample";
+import { galleryQuery, mediums, cities } from "@/lib/gallery";
 
 type Search = { medium?: string | undefined };
 export const Route = createFileRoute("/discover")({
   validateSearch: (s: Record<string, unknown>): Search => ({ medium: typeof s["medium"] === "string" ? s["medium"] : undefined }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
+  errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
+  notFoundComponent: () => <p>{t.account.empty}</p>,
   head: () => ({ meta: [
     { title: "Discover art, artists and events — quadreria" },
     { name: "description", content: "Browse paintings, prints, crochet, stickers and more from independent artists." },
@@ -21,12 +26,13 @@ const tabs = ["Art", "Artists", "Services", "Events"] as const;
 const prices = [{ l: "Any price", max: Infinity }, { l: "Under $50", max: 50 }, { l: "Under $250", max: 250 }, { l: "$250+", max: -250 }];
 
 function Discover() {
+  const { data: { artists, pieces, services, events } } = useSuspenseQuery(galleryQuery);
   const { medium: initial } = Route.useSearch();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Art");
   const [medium, setMedium] = useState<string | undefined>(initial);
   const [price, setPrice] = useState(0);
   const [city, setCity] = useState<string | undefined>();
-  const max = prices[price]!.max;
+  const max = (prices[price]?.max ?? Infinity);
   const list = pieces.filter((p) => (!medium || p.medium === medium) && (!city || p.city === city) && (max < 0 ? p.price >= -max : p.price < max));
   const cols = [0, 1].map((c) => list.filter((_, i) => i % 2 === c));
 

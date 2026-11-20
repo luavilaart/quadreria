@@ -1,11 +1,15 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
 import { Wordmark } from "@/components/q/Wordmark";
 import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
-import { artists, services, events, mediums } from "@/data/sample";
+import { galleryQuery, mediums } from "@/lib/gallery";
 import { t } from "@/i18n/en";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
+  errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
+  notFoundComponent: () => <p>{t.account.empty}</p>,
   head: () => ({ meta: [
     { title: "quadreria — Hire the artist, not the gig." },
     { name: "description", content: "Walk into artists' rooms. Buy originals and prints, hire artists, and get tickets to their classes and openings." },
@@ -17,6 +21,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { data: { artists, services, events } } = useSuspenseQuery(galleryQuery);
   return (
     <Page>
       <section className="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:pt-24">

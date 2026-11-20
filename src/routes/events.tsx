@@ -1,10 +1,15 @@
+import { t } from "@/i18n/en";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Page } from "@/components/q/Shell";
 import { EventCard } from "@/components/q/Cards";
-import { events, cities, eventTypes, fmtDate } from "@/data/sample";
+import { galleryQuery, cities, eventTypes, fmtDate } from "@/lib/gallery";
 
 export const Route = createFileRoute("/events")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
+  errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
+  notFoundComponent: () => <p>{t.account.empty}</p>,
   head: () => ({ meta: [
     { title: "Events calendar — quadreria" }, { name: "description", content: "Classes, openings, markets and online sessions hosted by artists." },
     { property: "og:title", content: "Events — quadreria" }, { property: "og:description", content: "Classes, openings, markets and online sessions." },
@@ -14,6 +19,7 @@ export const Route = createFileRoute("/events")({
 });
 
 function Events() {
+  const { data: { events } } = useSuspenseQuery(galleryQuery);
   const [city, setCity] = useState<string>();
   const [type, setType] = useState<string>();
   const list = events.filter((e) => (!city || e.city === city) && (!type || e.type === type)).sort((a, b) => a.date.localeCompare(b.date));

@@ -1,0 +1,7 @@
+- [x] Replace incorrect domain references and verify the quiz at 390px.
+- [x] Create secured database, storage policies, sample seed, and atomic tickets.
+- [x] Connect public pages to Cloud data while preserving design.
+- [x] Implement quiz signup, login, Google return, and account menu.
+- [x] Implement owner-only artist studio and collector tickets.
+- [x] Verify public pages, phone quiz layout, navigation, and live security settings (5 tests passed).
+- [ ] Verify signed-in signup, Google return, studio uploads, and ticket/check-in readback — blocked: preview login needed; temporary account approval unavailable.

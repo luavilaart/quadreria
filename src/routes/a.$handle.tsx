@@ -6,18 +6,18 @@ import { PieceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createContext, useContext, type ReactNode } from "react";
-import { t } from "@/i18n/en";
+import { copyFor, langOf, useFormat, useT } from "@/i18n";
 
 export const Route = createFileRoute("/a/$handle")({
   loader: async ({ params, context }) => { const data = await context.queryClient.ensureQueryData(galleryQuery); const a = data.artists.find(a => a.handle === params.handle); if (!a) throw notFound(); return a; },
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
-  head: ({ loaderData: a }) => ({ meta: a ? [
-    { title: `${a.name}'s room — quadreria` }, { name: "description", content: a.tagline },
-    { property: "og:title", content: `${a.name} on quadreria` }, { property: "og:description", content: a.tagline },
+  notFoundComponent: Empty,
+  head: ({ loaderData: a, match }) => { const t = copyFor(langOf(match.context)); return { meta: a ? [
+    { title: `${t.meta.roomTitle(a.name)} — quadreria` }, { name: "description", content: a.tagline },
+    { property: "og:title", content: t.meta.roomShare(a.name) }, { property: "og:description", content: a.tagline },
     ...(a.photo?.startsWith("https://") ? [{property:"og:image",content:a.photo},{name:"twitter:image",content:a.photo}] : []),
     { property: "og:type", content: "profile" }, { name: "twitter:card", content: "summary_large_image" },
-  ] : [{ title: "Room not found — quadreria" }, { name: "robots", content: "noindex" }] }),
+  ] : [{ title: `${t.meta.roomMissing} — quadreria` }, { name: "robots", content: "noindex" }] }; },
   component: Room,
 });
 
@@ -26,10 +26,12 @@ function Room() {
   const { data } = useSuspenseQuery(galleryQuery);
   const a = data.artists.find(a => a.handle === handle);
   const work = data.pieces.filter(p => p.artist === handle);
-  const collections = ["All", ...new Set(work.map((p) => p.collection))];
-  const [col, setCol] = useState("All");
+  const t = useT(); const f = useFormat();
+  // "" means every collection, so an artist can still name a collection "All".
+  const collections = ["", ...new Set(work.map((p) => p.collection))];
+  const [col, setCol] = useState("");
   const [salon, setSalon] = useState(true);
-  const shop = work.filter((p) => col === "All" || p.collection === col);
+  const shop = work.filter((p) => col === "" || p.collection === col);
 
   if (!a) return null;
   return (
@@ -40,7 +42,7 @@ function Room() {
       <section className="mx-auto grid max-w-6xl items-center gap-8 px-5 pb-16 pt-12 sm:grid-cols-[1fr_auto]">
         <div>
           {a.sample && <SampleBadge />}
-          <p className="label mt-6 opacity-70">@{a.handle} · {a.city}</p>
+          <p className="label mt-6 opacity-70">@{a.handle} · {f.city(a.city)}</p>
           <h1 className="mt-2 text-5xl leading-none sm:text-7xl">{a.name}</h1>
           <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
           <div className="mt-6 hidden gap-3 sm:flex">
@@ -48,7 +50,7 @@ function Room() {
             <a href="#shop" className="btn btn-ghost">{t.room.shop}</a>
           </div>
         </div>
-        <div className="w-40 sm:w-56"><Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={`${a.name} portrait`} className="rounded-2xl" /></div>
+        <div className="w-40 sm:w-56"><Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={t.room.portrait(a.name)} className="rounded-2xl" /></div>
       </section>
 
       <div className="flex flex-col rounded-t-[2rem] bg-room pb-28 sm:pb-0">
@@ -69,7 +71,7 @@ function Room() {
 
         <Section id="shop" title={t.room.shop}>
           <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5">
-            {collections.map((c) => <button key={c} onClick={() => setCol(c)} className={`chip text-ink ${col === c ? "chip-on" : ""}`}>{c}</button>)}
+            {collections.map((c) => <button key={c} onClick={() => setCol(c)} className={`chip text-ink ${col === c ? "chip-on" : ""}`}>{c || t.room.all}</button>)}
           </div>
           <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">
             {shop.map((p) => <div key={p.id}><PieceCard p={p} showArtist={false} /><div className="mt-2 flex flex-wrap gap-1">{p.tags.map((tg) => <span key={tg} className="label opacity-60">#{tg}</span>)}</div></div>)}
@@ -81,7 +83,7 @@ function Room() {
             {data.services.filter(s => s.artist === handle).map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-4 rounded-2xl bg-card p-5 text-ink">
                 <div><h3 className="text-xl">{s.title}</h3><p className="text-sm text-stone">{s.note}</p></div>
-                <button className="btn btn-primary shrink-0 !px-4 !py-2 text-sm">{s.price}</button>
+                <button className="btn btn-primary shrink-0 !px-4 !py-2 text-sm">{f.service(s)}</button>
               </div>
             ))}
           </div>
@@ -89,12 +91,12 @@ function Room() {
 
         <Section id="events" title={t.room.events}>
           <div className="grid gap-3 text-ink sm:grid-cols-2">{data.events.filter(e => e.artist === handle).map((e) => <EventCard key={e.id} e={e} />)}</div>
-          {data.events.filter(e => e.artist === handle).length === 0 && <p className="opacity-70">No events planned. Check back soon.</p>}
+          {data.events.filter(e => e.artist === handle).length === 0 && <p className="opacity-70">{t.room.noEvents}</p>}
         </Section>
 
         <Section id="about" title={t.room.about}>
           <div className="grid gap-6 sm:grid-cols-[2fr_3fr]">
-            <Art ratio={3 / 2} tone="butter" shape={1} title="Studio" className="rounded-2xl" />
+            <Art ratio={3 / 2} tone="butter" shape={1} title={t.room.studioPhoto} className="rounded-2xl" />
             <div>
               <p className="text-lg leading-relaxed">{a.bio}</p>
               <p className="label mt-6 opacity-70">{t.room.love}</p>
@@ -120,9 +122,9 @@ function Room() {
 
         <Section id="contact" title={t.room.contact}>
           <form onSubmit={(e) => e.preventDefault()} className="space-y-3 rounded-2xl bg-card p-5 text-ink">
-            <input placeholder="Your name" className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
-            <input placeholder="Email" type="email" className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
-            <textarea placeholder={`Tell ${a.name.split(" ")[0]} what you have in mind`} rows={4} className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
+            <input placeholder={t.room.yourName} className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
+            <input placeholder={t.room.email} type="email" className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
+            <textarea placeholder={t.room.message(a.name.split(" ")[0] ?? a.name)} rows={4} className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
             <button className="btn btn-primary w-full">{t.room.send}</button>
           </form>
         </Section>
@@ -149,3 +151,5 @@ function Section({ id, title, action, children }: { id: string; title: string; a
     </section>
   );
 }
+
+function Empty() { return <p>{useT().account.empty}</p>; }

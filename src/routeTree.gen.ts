@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as StudioRouteImport } from './routes/studio'
+import { Route as AHandleRouteImport } from './routes/a.$handle'
+import { Route as AHandleEIdRouteImport } from './routes/a.$handle_.e.$id'
+import { Route as AHandlePIdRouteImport } from './routes/a.$handle_.p.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AHandleRoute = AHandleRouteImport.update({
+  id: '/a/$handle',
+  path: '/a/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AHandleEIdRoute = AHandleEIdRouteImport.update({
+  id: '/a/$handle_/e/$id',
+  path: '/a/$handle/e/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AHandlePIdRoute = AHandlePIdRouteImport.update({
+  id: '/a/$handle_/p/$id',
+  path: '/a/$handle/p/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
+  '/join': typeof JoinRoute
+  '/studio': typeof StudioRoute
+  '/a/$handle': typeof AHandleRoute
+  '/a/$handle/e/$id': typeof AHandleEIdRoute
+  '/a/$handle/p/$id': typeof AHandlePIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
+  '/join': typeof JoinRoute
+  '/studio': typeof StudioRoute
+  '/a/$handle': typeof AHandleRoute
+  '/a/$handle/e/$id': typeof AHandleEIdRoute
+  '/a/$handle/p/$id': typeof AHandlePIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
+  '/join': typeof JoinRoute
+  '/studio': typeof StudioRoute
+  '/a/$handle': typeof AHandleRoute
+  '/a/$handle_/e/$id': typeof AHandleEIdRoute
+  '/a/$handle_/p/$id': typeof AHandlePIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/discover'
+    | '/events'
+    | '/join'
+    | '/studio'
+    | '/a/$handle'
+    | '/a/$handle/e/$id'
+    | '/a/$handle/p/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/discover'
+    | '/events'
+    | '/join'
+    | '/studio'
+    | '/a/$handle'
+    | '/a/$handle/e/$id'
+    | '/a/$handle/p/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/discover'
+    | '/events'
+    | '/join'
+    | '/studio'
+    | '/a/$handle'
+    | '/a/$handle_/e/$id'
+    | '/a/$handle_/p/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DiscoverRoute: typeof DiscoverRoute
+  EventsRoute: typeof EventsRoute
+  JoinRoute: typeof JoinRoute
+  StudioRoute: typeof StudioRoute
+  AHandleRoute: typeof AHandleRoute
+  AHandleEIdRoute: typeof AHandleEIdRoute
+  AHandlePIdRoute: typeof AHandlePIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a/$handle': {
+      id: '/a/$handle'
+      path: '/a/$handle'
+      fullPath: '/a/$handle'
+      preLoaderRoute: typeof AHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a/$handle_/e/$id': {
+      id: '/a/$handle_/e/$id'
+      path: '/a/$handle/e/$id'
+      fullPath: '/a/$handle/e/$id'
+      preLoaderRoute: typeof AHandleEIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a/$handle_/p/$id': {
+      id: '/a/$handle_/p/$id'
+      path: '/a/$handle/p/$id'
+      fullPath: '/a/$handle/p/$id'
+      preLoaderRoute: typeof AHandlePIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DiscoverRoute: DiscoverRoute,
+  EventsRoute: EventsRoute,
+  JoinRoute: JoinRoute,
+  StudioRoute: StudioRoute,
+  AHandleRoute: AHandleRoute,
+  AHandleEIdRoute: AHandleEIdRoute,
+  AHandlePIdRoute: AHandlePIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

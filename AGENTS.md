@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+<!-- AGENT-MEMORY:BEGIN -->
+- UI copy lives in src/i18n (one object per language) — enables EN/ES switching later.
+- Sample content lives in src/data/sample.ts — will be replaced by Lovable Cloud queries.
+- Artist room colors are `.room-<id>` classes setting --room/--room-fg, used via bg-room/text-room-fg — one template, many walls.
+<!-- AGENT-MEMORY:END -->

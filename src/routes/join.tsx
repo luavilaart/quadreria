@@ -47,7 +47,7 @@ function Join() {
   const artist = [
     { q: "What should we call you?", ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
-      <div className="relative"><span className="absolute left-5 top-1/2 -translate-y-1/2 text-stone">quadreria.com/a/</span>
+      <div className="relative"><span className="absolute left-5 top-1/2 -translate-y-1/2 text-stone">quadreria.art/a/</span>
         <input className={`${inp} pl-[9.5rem]`} placeholder="handle" value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} /></div>
     </div>) },
     { q: "Add a profile photo", ok: true, body: (

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {useTaxonomy} from "@/components/q/TaxonomyProvider";
+import { Credentials } from "@/components/q/Credentials";
 import {activeEntries,label} from "@/data/taxonomy";
 import { QButton } from "@/components/q/QButton";
-import { useAccount } from "@/components/q/AccountProvider";
+import { useAccount, completeRegistration } from "@/components/q/AccountProvider";
 import { toast } from "sonner";
 import { useFormat, useT } from "@/i18n";
 import { Wordmark } from "@/components/q/Wordmark";
@@ -11,6 +12,9 @@ import { Art } from "@/components/q/Art";
 import { roomColors, cities, type RoomColor } from "@/data/sample";
 
 export const Route = createFileRoute("/join")({
+  // ?role=artist or ?role=collector skips the first question (used by the home "Start here" card).
+  validateSearch: (s: Record<string, unknown>): { role?: "artist" | "collector" } =>
+    s["role"] === "artist" || s["role"] === "collector" ? { role: s["role"] } : {},
   head: () => ({ meta: [
     { title: "Join quadreria — open your room" }, { name: "description", content: "A quick, friendly quiz to set up your Artist room or Collector profile." },
     { property: "og:title", content: "Join quadreria" }, { property: "og:description", content: "Open your room in a few taps." },
@@ -27,8 +31,9 @@ function Join() {
   const {state,lang,c}=useTaxonomy();
   const t = useT(); const f = useFormat();
   const mediumOptions=activeEntries(state.taxonomy,"medium").map(t=>label(t,lang));
-  const [role, setRole] = useState<Role>();
-  const [i, setI] = useState(0);
+  const { role: chosenRole } = Route.useSearch();
+  const [role, setRole] = useState<Role | undefined>(chosenRole);
+  const [i, setI] = useState(chosenRole ? 1 : 0);
   const [name, setName] = useState("");
   const [handle, setHandle] = useState("");
   const [meds, setMeds] = useState<string[]>([]);
@@ -57,7 +62,10 @@ function Join() {
     </div>) };
 
 
-  const accountStep = {q:c.sample,ok:false,body:<QButton className="btn-primary w-full" onClick={()=>setI(i+1)}>{c.save}</QButton>};
+  // Mediums are picked by label in the current language; accounts store the English name.
+  const mediumsEn = meds.map(m => { const e = activeEntries(state.taxonomy,"medium").find(x => label(x,lang) === m); return e ? label(e,"en") : m; });
+  const registration = {role: role ?? "collector", name, handle, city, mediums: mediumsEn, room, bio, wants: want, links: links.split("\n").filter(Boolean).map(url=>({label:url,url:url.startsWith("https://")?url:`https://${url}`}))};
+  const accountStep = {q:t.account.complete,ok:false,body:user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next={role==="artist"?"/studio":"/discover"} onSuccess={()=>{void refresh();setI(i+1);}}/>};
   const artist = [
     { q: t.account.quiz.name, ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />

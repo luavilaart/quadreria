@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
 import { HeroVideo } from "@/components/q/HeroVideo";
+import { JoinCard } from "@/components/q/JoinCard";
 import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
 import { useTaxonomy } from "@/components/q/TaxonomyProvider";
@@ -29,7 +30,8 @@ function Home() {
   return (
     <Page>
       <HeroVideo label="quadreria" />
-      <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 sm:pt-14">
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-14 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_24rem]">
+        <div>
         <SampleBadge />
         <p className="font-display mt-6 max-w-xl text-3xl leading-tight sm:text-4xl">{t.tagline}</p>
         <div className="molding mt-5 max-w-md" aria-hidden />
@@ -38,6 +40,8 @@ function Home() {
           <Link to="/discover" className="btn btn-primary">{t.home.findArt}</Link>
           <Link to="/join" className="btn btn-ghost">{t.home.openRoom}</Link>
         </div>
+        </div>
+        <JoinCard />
       </section>
 
       <section className="mx-auto max-w-6xl px-5">

@@ -7,10 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {useTaxonomy} from "./TaxonomyProvider";
-import { t } from "@/i18n/en";
+import { useT } from "@/i18n";
 
 export function SiteHeader() {
   const {lang,setLang,c}=useTaxonomy();
+  const t=useT();
   const {user,role,profile}=useAccount();
   const qc=useQueryClient();const navigate=useNavigate();
   async function logout(){await qc.cancelQueries();qc.clear();await supabase.auth.signOut();await navigate({to:"/auth",search:{next:"/"},replace:true});}
@@ -32,6 +33,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const t = useT();
   return (
     <footer className="mt-24 border-t border-line">
       <div className="mx-auto max-w-6xl px-5 py-12">
@@ -40,7 +42,7 @@ export function SiteFooter() {
         <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm">
           {t.footer.map((f) => <li key={f}><a href="#" className="hover:text-deep-tomato">{f}</a></li>)}
         </ul>
-        <p className="label mt-10 text-stone">© 2026 quadreria · {t.sample} shown throughout</p>
+        <p className="label mt-10 text-stone">© 2026 quadreria · {t.sampleShown}</p>
       </div>
     </footer>
   );
@@ -63,5 +65,6 @@ export function SectionTitle({ kicker, title, action }: { kicker?: string; title
 }
 
 export function SampleBadge() {
+  const t = useT();
   return <span className="label inline-block rounded-full border border-current px-2.5 py-1 opacity-70">{t.sample}</span>;
 }

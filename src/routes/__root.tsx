@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import { TaxonomyProvider } from "@/components/q/TaxonomyProvider";
+import { TaxonomyProvider, useTaxonomy } from "@/components/q/TaxonomyProvider";
 import { AccountProvider } from "@/components/q/AccountProvider";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
@@ -128,7 +128,14 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AccountProvider><TaxonomyProvider><Outlet /><Toaster /></TaxonomyProvider></AccountProvider>
+      <AccountProvider><TaxonomyProvider><HtmlLang /><Outlet /><Toaster /></TaxonomyProvider></AccountProvider>
     </QueryClientProvider>
   );
+}
+
+/** Keeps <html lang> in step with the ES/EN toggle so screen readers use the right voice. */
+function HtmlLang() {
+  const { lang } = useTaxonomy();
+  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  return null;
 }

@@ -5,7 +5,7 @@ import {activeEntries,label} from "@/data/taxonomy";
 import { QButton } from "@/components/q/QButton";
 import { useAccount } from "@/components/q/AccountProvider";
 import { toast } from "sonner";
-import { t } from "@/i18n/en";
+import { useFormat, useT } from "@/i18n";
 import { Wordmark } from "@/components/q/Wordmark";
 import { Art } from "@/components/q/Art";
 import { roomColors, cities, type RoomColor } from "@/data/sample";
@@ -20,10 +20,12 @@ export const Route = createFileRoute("/join")({
 });
 
 type Role = "artist" | "collector";
-const wants = t.account.quiz.wantOptions;
+// Stored ids for "what do you want to do here"; labels come from the copy.
+const wants = ["sell", "portfolio", "services", "events"] as const;
 
 function Join() {
   const {state,lang,c}=useTaxonomy();
+  const t = useT(); const f = useFormat();
   const mediumOptions=activeEntries(state.taxonomy,"medium").map(t=>label(t,lang));
   const [role, setRole] = useState<Role>();
   const [i, setI] = useState(0);
@@ -60,7 +62,7 @@ function Join() {
     { q: t.account.quiz.name, ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />
       <div className="relative"><span className="absolute left-5 top-1/2 -translate-y-1/2 text-stone">quadreria.art/a/</span>
-        <input className={`${inp} pl-[9.5rem]`} placeholder="handle" value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} /></div>
+        <input className={`${inp} pl-[9.5rem]`} placeholder={t.account.quiz.handlePlaceholder} value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} /></div>
     </div>) },
     { q: t.account.quiz.photo, ok: true, body: (
       <label className="flex aspect-square w-48 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-line bg-card text-stone">
@@ -68,20 +70,20 @@ function Join() {
         <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) {setPhotoFile(f);setPhoto(URL.createObjectURL(f));} }} />
       </label>) },
     { q: t.account.quiz.make, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={v=>{if(role==="artist"&&v.length>state.settings.free.max_mediums){toast.error(c.limitError);return;}setMeds(v);}} /> },
-    { q: t.account.quiz.wants, ok: want.length > 0, body: <div className="space-y-3">{wants.map((w) => <Big key={w} on={want.includes(w)} onClick={() => toggle(want, setWant, w)}>{w}</Big>)}</div> },
+    { q: t.account.quiz.wants, ok: want.length > 0, body: <div className="space-y-3">{wants.map((w) => <Big key={w} on={want.includes(w)} onClick={() => toggle(want, setWant, w)}>{t.account.quiz.wantOptions[w]}</Big>)}</div> },
     { q: t.account.quiz.color, ok: true, body: (
       <div className="grid grid-cols-4 gap-3">{roomColors.map((c) => (
         <QButton key={c.id} onClick={() => setRoom(c.id)} aria-pressed={room === c.id} className="!block !p-0 text-center">
           <span className={`room-${c.id} block w-full aspect-square rounded-2xl border bg-room ${room === c.id ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-wall" : "border-line"}`} />
-          <span className="mt-1 block text-xs">{c.name}</span>
+          <span className="mt-1 block text-xs">{t.roomColors[c.id]}</span>
         </QButton>))}</div>) },
     { q: t.account.quiz.bio, ok: bio.length > 0, body: <textarea className={inp} rows={4} maxLength={200} placeholder={t.account.quiz.bioPlaceholder} value={bio} onChange={(e) => setBio(e.target.value)} /> },
     { q: t.account.quiz.links, ok: true, body: <textarea className={inp} rows={3} placeholder={t.account.quiz.linksPlaceholder} value={links} onChange={(e) => setLinks(e.target.value)} /> },
-    { q: t.account.city, ok: !!city, body: <div className="space-y-3">{cities.map(c => <Big key={c} on={city===c} onClick={()=>setCity(c)}>{c}</Big>)}</div> },
+    { q: t.account.city, ok: !!city, body: <div className="space-y-3">{cities.map(c => <Big key={c} on={city===c} onClick={()=>setCity(c)}>{f.city(c)}</Big>)}</div> },
     accountStep,
     { q: t.account.quiz.ready, ok: true, done: true, body: (
       <div className={`room-${room} rounded-2xl bg-room p-6 text-room-fg`}>
-        <p className="label opacity-70">@{handle || "you"}</p>
+        <p className="label opacity-70">@{handle || t.account.quiz.you}</p>
         <h2 className="mt-1 text-4xl">{name || t.account.quiz.namePlaceholder}</h2>
         <p className="mt-2 opacity-85">{bio || t.account.quiz.bioEmpty}</p>
         <div className="mt-5 grid grid-cols-3 items-end gap-3"><Art ratio={4 / 5} tone="cream" shape={0} /><Art ratio={1} tone="butter" shape={2} /><Art ratio={2 / 3} tone="sky" shape={1} /></div>
@@ -91,7 +93,7 @@ function Join() {
   const collector = [
     { q: t.account.quiz.collectorName, ok: !!name, body: <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} /> },
     { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={v=>{if(role==="artist"&&v.length>state.settings.free.max_mediums){toast.error(c.limitError);return;}setMeds(v);}} /> },
-    { q: t.account.quiz.where, ok: !!city, body: <div className="space-y-3">{[...cities, t.account.quiz.elsewhere].map((c) => <Big key={c} on={city === c} onClick={() => setCity(c)}>{c}</Big>)}</div> },
+    { q: t.account.quiz.where, ok: !!city, body: <div className="space-y-3">{[...cities, t.account.quiz.elsewhere].map((c) => <Big key={c} on={city === c} onClick={() => setCity(c)}>{f.city(c)}</Big>)}</div> },
     accountStep,
     { q: `${t.account.quiz.welcome}${name ? `, ${name.split(" ")[0]}` : ""}.`, ok: true, done: true, body: <p className="text-lg text-stone">{t.account.quiz.welcomeCopy}</p> },
   ];

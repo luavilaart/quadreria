@@ -31,16 +31,19 @@ function Room() {
   const { handle } = Route.useParams();
   const { data } = useSuspenseQuery(galleryQuery);
   const a = data.artists.find(a => a.handle === handle);
-  const work = data.pieces.filter(p => p.artist === handle && p.review_status === "approved");
+  const all = data.pieces.filter(p => p.artist === handle && p.review_status === "approved");
+  // Images hang on the Work wall; audio and video get their own "Listen & watch" section.
+  const work = all.filter(p => p.media_type === "image");
+  const media = all.filter(p => p.media_type !== "image");
   // "" means every collection, so an artist can still name a collection "All".
-  const collections = ["", ...new Set(work.map((p) => p.collection))];
+  const collections = ["", ...new Set(all.map((p) => p.collection))];
   const [col, setCol] = useState("");
   const [salon, setSalon] = useState(true);
-  const shop = work.filter((p) => isForSale(p) && (col === "" || p.collection === col));
+  const shop = all.filter((p) => isForSale(p) && (col === "" || p.collection === col));
 
   if (!a) return null;
   return (
-    <RoomSections.Provider value={{ visible: a.visible_sections, order: a.section_order }}>
+    <RoomSections.Provider value={withMediaSection(a.section_order, a.visible_sections)}>
     <div className={`room-${a.room} bg-room text-room-fg`}>
       <SiteHeader />
       {/* Entrance */}
@@ -61,7 +64,7 @@ function Room() {
       </section>
 
       <div className="flex flex-col rounded-t-[2rem] bg-room pb-28 sm:pb-0">
-        <Section id="work" title={t.room.work} action={
+        {work.length > 0 && <Section id="work" title={t.room.work} action={
           <div className="flex rounded-full border border-current p-0.5 text-xs">
             {[true, false].map((s) => <button key={String(s)} onClick={() => setSalon(s)} className={`rounded-full px-3 py-1 ${salon === s ? "bg-room-fg text-room" : ""}`}>{s ? t.room.salon : t.room.tidy}</button>)}
           </div>}>
@@ -74,7 +77,18 @@ function Room() {
               ))}
             </div>
           ) : <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">{work.map((p) => <PieceCard key={p.id} p={p} showArtist={false} />)}</div>}
-        </Section>
+        </Section>}
+
+        {media.length > 0 && <Section id="media" title={c.listen}>
+          <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
+            {media.map((p) => (
+              <div key={p.id}>
+                <div className="rounded-lg bg-paper p-2"><MediaTile p={p} /></div>
+                <div className="flex items-start justify-between gap-2"><Link to="/a/$handle/p/$id" params={{ handle: a.handle, id: p.id }} className="mt-2 block">{p.title}</Link><FavoriteButton piece={p.id} /></div>
+              </div>
+            ))}
+          </div>
+        </Section>}
 
         <Section id="shop" title={t.room.shop}>
           <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5">
@@ -145,6 +159,13 @@ function Room() {
     </div>
     </RoomSections.Provider>
   );
+}
+
+/** Rooms saved before "Listen & watch" existed get it right after the Work wall, shown by default. */
+function withMediaSection(order: string[], visible: string[]) {
+  if (order.includes("media")) return { order, visible };
+  const at = order.indexOf("work") + 1;
+  return { order: [...order.slice(0, at), "media", ...order.slice(at)], visible: [...visible, "media"] };
 }
 
 const RoomSections = createContext({ visible: [] as string[], order: [] as string[] });

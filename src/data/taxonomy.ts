@@ -6,11 +6,13 @@ export type ArtistSpecialty = {artist_id:string;specialty_id:string};
 export type PieceSpecialty = {piece_id:string;specialty_id:string};
 export type PieceStyle = {piece_id:string;style_id:string};
 export type MediaKind = 'image'|'video'|'audio';
-export type PieceMedia = {id:string;piece_id:string;kind:MediaKind;url:string;provider:'youtube'|'vimeo'|'soundcloud'|'spotify'|'bandcamp'|'upload';poster_url:string|null;duration_s:number|null};
+export type PieceMedia = {id:string;piece_id:string;kind:MediaKind;url:string;provider:'youtube'|'vimeo'|'soundcloud'|'spotify'|'bandcamp'|'upload';poster_url:string|null;duration_s:number|null;size_mb?:number|null};
 export type TaxonomyPiece = {medium_id:string;format_id:string;media_type:MediaKind;edition:number|null};
 export type Plan = 'free'|'pro';
-export type TaxonomySettings = Record<Plan,{max_mediums:number;max_specialties:number;max_pieces:number;video_upload_max_s:number;audio_upload_max_s:number}>;
-export const defaultSettings:TaxonomySettings = {free:{max_mediums:3,max_specialties:8,max_pieces:12,video_upload_max_s:60,audio_upload_max_s:300},pro:{max_mediums:6,max_specialties:20,max_pieces:12,video_upload_max_s:600,audio_upload_max_s:3600}};
+/** max_pieces null means unlimited (Pro, per the build brief). Upload sizes are in MB. */
+export type TaxonomySettings = Record<Plan,{max_mediums:number;max_specialties:number;max_pieces:number|null;video_upload_max_s:number;audio_upload_max_s:number;video_upload_max_mb:number;audio_upload_max_mb:number}>;
+// Pro upload sizes are placeholders until the open question on Pro limits is answered.
+export const defaultSettings:TaxonomySettings = {free:{max_mediums:3,max_specialties:8,max_pieces:12,video_upload_max_s:60,audio_upload_max_s:300,video_upload_max_mb:100,audio_upload_max_mb:20},pro:{max_mediums:6,max_specialties:20,max_pieces:null,video_upload_max_s:600,audio_upload_max_s:3600,video_upload_max_mb:500,audio_upload_max_mb:100}};
 function entry(kind:TaxonomyKind,row:readonly string[],order:number,parent:string|null=null):TaxonomyEntry {
  const [slug='',slug_es='',label_en='',label_es='']=row;
  return {id:parent?`${parent}:${slug}`:`${kind}:${slug}`,kind,parent_id:parent,slug,slug_es,label_en,label_es,...taxonomyIntro(label_en,label_es),sort_order:order,status:'active',suggested_by:null,merged_into:null};
@@ -26,8 +28,9 @@ export function validateSelection(mediums:ArtistMedium[],specialties:ArtistSpeci
  return null;
 }
 export function validatePiece(count:number,media:PieceMedia[],plan:Plan,settings:TaxonomySettings):string|null {
- if(count>=settings[plan].max_pieces)return 'pieceError';
+ const maxPieces=settings[plan].max_pieces;if(maxPieces!==null&&count>=maxPieces)return 'pieceError';
  if(media.some(m=>m.provider==='upload'&&m.kind!=='image'&&(m.duration_s===null||m.duration_s<=0||m.duration_s> (m.kind==='video'?settings[plan].video_upload_max_s:settings[plan].audio_upload_max_s))))return 'durationError';
+ if(media.some(m=>m.provider==='upload'&&m.kind!=='image'&&m.size_mb!=null&&m.size_mb>(m.kind==='video'?settings[plan].video_upload_max_mb:settings[plan].audio_upload_max_mb)))return 'sizeError';
  return null;
 }
 export const isForSale=(p:{format_id:string;status?:string})=>!['format:showcase-only','format:digital-download'].includes(p.format_id)&&p.status!=='sold'&&p.status!=='hidden';

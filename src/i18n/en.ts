@@ -8,6 +8,10 @@ export const en = {
   sampleShown: "Sample data shown throughout",
   lang: { label: "Language", es: "Español", en: "English", short: { es: "ES", en: "EN" } },
   nav: { discover: "Discover", events: "Events", join: "Join", studio: "Studio", about: "About us", menu: "Menu" },
+  cityPicker: {
+    hint: "Or type any city in the world.",
+    placeholder: "Your city",
+  },
   preview: {
     readySub: "This is how collectors will see it.",
     firstPiece: "Your first piece",

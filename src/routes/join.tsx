@@ -12,6 +12,8 @@ import { useFormat, useT } from "@/i18n";
 import { Wordmark } from "@/components/q/Wordmark";
 import { Art } from "@/components/q/Art";
 import { RoomPreview } from "@/components/q/RoomPreview";
+import { CityPicker } from "@/components/q/CityPicker";
+import { normalizeCity } from "@/data/places";
 import { X } from "lucide-react";
 import { roomColors, cities, type RoomColor } from "@/data/sample";
 
@@ -72,7 +74,7 @@ function Join() {
 
   // Mediums are picked by label in the current language; accounts store the English name.
   const mediumsEn = meds.map(m => { const e = activeEntries(state.taxonomy,"medium").find(x => label(x,lang) === m); return e ? label(e,"en") : m; });
-  const registration = {role: role ?? "collector", name, handle, city, mediums: mediumsEn, room, bio, wants: want, links: resolveLinks(links).filter((l):l is NonNullable<typeof l>=>l!==null),medium_ids:meds.map(m=>activeEntries(state.taxonomy,"medium").find(x=>label(x,lang)===m)?.id??m),marketing_opt_in:marketing};
+  const registration = {role: role ?? "collector", name, handle, city: normalizeCity(city), mediums: mediumsEn, room, bio, wants: want, links: resolveLinks(links).filter((l):l is NonNullable<typeof l>=>l!==null),medium_ids:meds.map(m=>activeEntries(state.taxonomy,"medium").find(x=>label(x,lang)===m)?.id??m),marketing_opt_in:marketing};
   const newsletter=<label className="mb-5 flex items-start gap-3 text-sm"><input type="checkbox" checked={marketing} onChange={e=>setMarketing(e.target.checked)} className="mt-1 shrink-0 accent-tomato"/><span>{featureCopy[lang].marketing}</span></label>;
   const accountStep = {q:t.account.complete,ok:false,body:<>{newsletter}{user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next="/studio" onSuccess={()=>{void refresh();setI(i+1);}}/>}</>};
   const artist = [
@@ -96,12 +98,12 @@ function Join() {
         </QButton>))}</div>) },
     { q: t.account.quiz.bio, ok: bio.length > 0, body: <textarea className={inp} rows={4} maxLength={200} placeholder={t.account.quiz.bioPlaceholder} value={bio} onChange={(e) => setBio(e.target.value)} /> },
     { q: t.account.quiz.links, ok: resolveLinks(links).every(Boolean), body: <><LinkEditor value={links} onChange={setLinks}/>{resolveLinks(links).some(l=>!l)&&<p role="alert" className="mt-3 text-stone">{featureCopy[lang].linkInvalid}</p>}</> },
-    { q: t.account.city, ok: !!city, body: <div className="space-y-3">{cities.map(c => <Big key={c} on={city===c} onClick={()=>setCity(c)}>{f.city(c)}</Big>)}</div> },
+    { q: t.account.city, ok: normalizeCity(city).length >= 2, body: <CityPicker value={city} onChange={setCity} /> },
     accountStep,
     { q: t.account.quiz.ready, ok: true, done: true, preview: true, body: (
       <>
         <p className="-mt-4 mb-6 text-stone">{t.preview.readySub}</p>
-        <RoomPreview data={{ name, handle, city, bio, room, photo, mediums: meds }} height="h-[min(560px,62dvh)]" />
+        <RoomPreview data={{ name, handle, city: normalizeCity(city), bio, room, photo, mediums: meds, links: resolveLinks(links).filter((l): l is NonNullable<typeof l> => l !== null) }} height="h-[min(560px,62dvh)]" />
       </>) },
   ];
   const collector = [

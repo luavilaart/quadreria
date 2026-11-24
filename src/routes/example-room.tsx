@@ -6,6 +6,7 @@ import { RoomPreview, type PreviewRoomData } from "@/components/q/RoomPreview";
 import { useTaxonomy } from "@/components/q/TaxonomyProvider";
 import { galleryQuery, type Gallery } from "@/lib/gallery";
 import { label } from "@/data/taxonomy";
+import { asRoomLinks } from "@/lib/links";
 import { pageHead } from "@/lib/head";
 import { copyFor, langOf, useT } from "@/i18n";
 
@@ -45,6 +46,7 @@ function ExampleRoom() {
         bio: a.bio,
         room: a.room,
         photo: a.photo,
+        links: asRoomLinks(a.links),
         mediums: state.artist_mediums
           .filter((m) => m.artist_id === a.id)
           .map((m) => state.taxonomy.find((x) => x.id === m.medium_id))

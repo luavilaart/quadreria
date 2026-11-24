@@ -5,9 +5,9 @@ import {activeEntries,label,isForSale} from '@/data/taxonomy';
 import {useTaxonomy} from './TaxonomyProvider';
 import {QButton} from './QButton';
 import {PieceCard,RoomCard,ServiceCard,EventCard} from './Cards';
-export function TaxonomyBrowse({initialMedium='',initialSpecialty='',language}:{initialMedium?:string;initialSpecialty?:string;language?:'en'|'es'}) {
+export function TaxonomyBrowse({initialMedium='',initialSpecialty='',initialTab='art',language}:{initialMedium?:string;initialSpecialty?:string;initialTab?:'art'|'artists';language?:'en'|'es'}) {
  const {state,lang:globalLang,c:globalCopy}=useTaxonomy();const lang=language??globalLang;const c=language?taxonomyCopy[language]:globalCopy;
- const {data}=useSuspenseQuery(galleryQuery);const [tab,setTab]=useState('art');const [medium,setMedium]=useState(initialMedium);const [specialty,setSpecialty]=useState(initialSpecialty);const [format,setFormat]=useState('');const [price,setPrice]=useState('');const [city,setCity]=useState('');const [sale,setSale]=useState(false);
+ const {data}=useSuspenseQuery(galleryQuery);const [tab,setTab]=useState<string>(initialTab);const [medium,setMedium]=useState(initialMedium);const [specialty,setSpecialty]=useState(initialSpecialty);const [format,setFormat]=useState('');const [price,setPrice]=useState('');const [city,setCity]=useState('');const [sale,setSale]=useState(false);
  const selector=(name:string,value:string,onChange:(v:string)=>void,options:{id:string;label:string}[])=><label className="min-w-0 text-sm">{name}<select aria-label={name} value={value} onChange={e=>onChange(e.target.value)} className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-3"><option value="">{c.all}</option>{options.map(o=><option key={o.id} value={o.id}>{o.label}</option>)}</select></label>;
  const opts=(kind:'medium'|'specialty'|'format')=>activeEntries(state.taxonomy,kind,kind==='specialty'?medium:undefined).map(t=>({id:t.id,label:label(t,lang)}));
  const artistMatches=(id:string)=> (!medium||state.artist_mediums.some(m=>m.artist_id===id&&m.medium_id===medium))&&(!specialty||state.artist_specialties.some(s=>s.artist_id===id&&s.specialty_id===specialty));

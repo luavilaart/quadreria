@@ -14,7 +14,7 @@ export function PieceCard({ p, showArtist = true }: { p: Piece; showArtist?: boo
     <div className="group block">
       {p.media_type === "image" ? <Link to="/a/$handle/p/$id" params={{handle:p.artist,id:p.id}}><MediaTile p={p}/></Link> : <MediaTile p={p}/>}
       <div className="flex items-start justify-between gap-1"><Link className="min-w-0 flex-1" to="/a/$handle/p/$id" params={{ handle: p.artist, id: p.id }}>
-      <div className="mt-2 flex items-baseline justify-between gap-2">
+      <div className="mt-2 flex flex-col items-start gap-1">
         <h3 className="text-base leading-tight">{p.title}</h3>
         <span className="text-sm font-medium">{isForSale(p) ? f.price(p.price) : ""}</span>
       </div>

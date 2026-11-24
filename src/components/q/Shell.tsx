@@ -21,9 +21,9 @@ export function SiteHeader() {
         <Link to="/" className="text-2xl"><Wordmark /></Link>
         <nav className="flex flex-wrap items-center gap-3 text-sm">
           <QButton aria-label={lang==="en"?"Español":"English"} onClick={()=>setLang(lang==="en"?"es":"en")} className="!px-2 !py-1 text-xs">{lang==="en"?"ES":"EN"}</QButton>
-          <Link to="/discover" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.art}</Link>
+          {user&&<Link to="/discover" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.art}</Link>}
           {user&&<Link to="/studio" className="hover:text-deep-tomato">{c.studio}</Link>}
-          <Link to="/events" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.events}</Link>
+          {user&&<Link to="/events" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.events}</Link>}
           {!user ? <><Link to="/auth" search={{next:"/"}} className="hover:text-deep-tomato">{c.login}</Link><Link to="/join" className="btn btn-primary !px-4 !py-2 text-sm">{c.join}</Link></> :
             <DropdownMenu><DropdownMenuTrigger asChild><QButton className="!px-3 !py-2 text-sm btn-ghost">{t.account.account}</QButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={()=>void logout()}>{t.account.logout}</DropdownMenuItem></DropdownMenuContent></DropdownMenu>}
         </nav>

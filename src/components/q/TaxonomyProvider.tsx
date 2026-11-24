@@ -1,8 +1,9 @@
 import {createContext,useContext,useState,type ReactNode} from 'react';
-import {useQueryClient} from '@tanstack/react-query';
+import {useQuery,useQueryClient} from '@tanstack/react-query';
 import {useRouter} from '@tanstack/react-router';
 import {taxonomy,defaultSettings,type TaxonomyEntry,type TaxonomySettings,type ArtistMedium,type ArtistSpecialty,type PieceStyle,type PieceSpecialty,type PieceMedia} from '@/data/taxonomy';
 import {artist_mediums,artist_specialties,piece_styles,piece_specialties,piece_media,type SampleGallery,sampleGallery} from '@/data/sample-gallery';
+import {galleryQuery} from '@/lib/gallery';
 import {taxonomyCopy,type Language} from '@/i18n/taxonomy';
 export type SampleState={taxonomy:TaxonomyEntry[];settings:TaxonomySettings;artist_mediums:ArtistMedium[];artist_specialties:ArtistSpecialty[];piece_styles:PieceStyle[];piece_specialties:PieceSpecialty[];piece_media:PieceMedia[];gallery:SampleGallery;notifications:{artist_id:string;message:string}[]};
 const initial:SampleState={taxonomy,settings:defaultSettings,artist_mediums,artist_specialties,piece_styles,piece_specialties,piece_media,gallery:sampleGallery,notifications:[]};
@@ -15,8 +16,8 @@ export function resolveSuggestion(s:SampleState,id:string,target:TaxonomyEntry|n
 }
 const Context=createContext<{state:SampleState;update:(fn:(s:SampleState)=>SampleState)=>void;lang:Language;setLang:(l:Language)=>void}|null>(null);
 export function TaxonomyProvider({children}:{children:ReactNode}) {
- const [state,setState]=useState(initial);const [lang,setLang]=useState<Language>('en');const qc=useQueryClient();const router=useRouter();
- function update(fn:(s:SampleState)=>SampleState){const next=fn(state);setState(next);qc.setQueryData(['gallery'],next.gallery);qc.setQueryData(['taxonomy'],next.taxonomy);void router.invalidate();}
+ const [localState,setState]=useState(initial);const {data}=useQuery(galleryQuery);const state:SampleState=data?{...localState,taxonomy:data.taxonomy,artist_mediums:data.artist_mediums,artist_specialties:data.artist_specialties,piece_specialties:data.piece_specialties,gallery:data}:localState;const [lang,setLang]=useState<Language>('en');const qc=useQueryClient();const router=useRouter();
+ function update(fn:(s:SampleState)=>SampleState){const next=fn(state);setState(next);qc.setQueryData(['gallery'],{...data,...next.gallery,taxonomy:next.taxonomy,artist_mediums:next.artist_mediums,artist_specialties:next.artist_specialties,piece_specialties:next.piece_specialties});qc.setQueryData(['taxonomy'],next.taxonomy);void router.invalidate();}
  return <Context.Provider value={{state,update,lang,setLang}}>{children}</Context.Provider>;
 }
 export function useTaxonomy(){const value=useContext(Context);if(!value)throw new Error('TaxonomyProvider missing');return {...value,c:taxonomyCopy[value.lang]};}

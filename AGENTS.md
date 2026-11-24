@@ -31,15 +31,18 @@ use the editor.
 
 <!-- AGENT-MEMORY:BEGIN -->
 - UI copy lives in src/i18n (one object per language) — enables EN/ES switching later.
-- Taxonomy v1 uses typed normalized sample data through the gallery Query and TaxonomyProvider; sample edits never write to Cloud, keeping this front-end preview isolated. Existing Cloud/auth code remains available but is not taxonomy storage.
+- Public gallery loaders read Cloud taxonomy and normalized artist/piece joins; preserve unseeded, explicitly marked media samples. Taxonomy review remains a sample-only preview without Cloud writes.
 - Signup photos persist temporarily in IndexedDB across email/Google returns and move to Cloud storage after registration; no account permissions live in browser storage.
 - Gallery buttons use the unstyled design-system variant so existing pill styling remains unchanged.
 - Roles are immutable after transactional registration in user_roles; profiles never carry permissions.
 - Ticket reservation and check-in use database functions with locks and ownership checks, preventing overbooking and browser privilege changes.
 - Studio is a single role-aware route under the authenticated layout; taxonomy review and taxonomy browsing remain public, and legacy tickets links redirect to Studio.
 - Favorites and follows persist in Cloud using canonical gallery piece IDs and artist handles, including sample media; RLS limits rows to their creator and a caller-scoped RPC exposes only artist-owned aggregate counts.
-- Artist social panels read owner-scoped Cloud room/pieces alongside the unchanged taxonomy sample editor so private counts never imply ownership of sample artists.
+- Artist Studio owner panels persist real taxonomy, room links, pieces and media separately from its labeled sample editor, preventing sample ownership confusion.
 - Artist room colors are `.room-<id>` classes setting --room/--room-fg, used via bg-room/text-room-fg — one template, many walls.
-- Taxonomy IDs and normalized joins are the canonical sample relationships; validate selections and upload limits in shared pure helpers so future server enforcement reuses the same rules.
+- Taxonomy IDs and normalized joins are canonical; owner-scoped transactional functions enforce selection limits and matching specialties. Shared pure helpers enforce upload settings before storage writes.
 - Taxonomy media tiles mount raw media or external embeds only after playback starts and coordinate one active player; covers remain lightweight on the wall.
+- Shared shop controls validate URL state with optional-input Zod schemas; sorting uses public aggregate counts, private interests/follows, and a nullable artist-rating adapter for future reviews.
+- Registration records newsletter consent transactionally using server time and role-derived source; client drafts never grant roles.
+- Platform links normalize through one shared helper for quiz and Studio; room media loads players only after an explicit play action and coordinates one active player.
 <!-- AGENT-MEMORY:END -->

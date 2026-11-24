@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { sampleGallery } from '@/data/sample-gallery';
-export const galleryQuery = queryOptions({ queryKey: ['gallery'], queryFn: async () => sampleGallery, staleTime: Infinity });
+import {getGallery} from './gallery.functions';
+export const galleryQuery = queryOptions({ queryKey: ['gallery'], queryFn: () => getGallery(), staleTime: 30_000 });
 export { roomColors, mediums, cities, eventTypes, usd, fmtDate } from '@/data/sample';
 export type Gallery = typeof sampleGallery;
 export type Artist = Gallery['artists'][number];

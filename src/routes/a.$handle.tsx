@@ -1,3 +1,10 @@
+import {ShopGrid} from '@/components/q/ShopGrid';
+import {RoomMediaTile} from '@/components/q/RoomMediaTile';
+import {PlatformIcon} from '@/components/q/LinkEditor';
+import {asRoomLinks} from '@/lib/links';
+import {featureCopy} from '@/i18n/features';
+import {shopSearchValidator} from '@/lib/shop';
+import {QButton} from '@/components/q/QButton';
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader, SiteFooter, SampleBadge } from "@/components/q/Shell";
@@ -13,6 +20,7 @@ import { useFormat, useT } from "@/i18n";
 import { FavoriteButton, FollowButton } from '@/components/q/SocialActions';
 
 export const Route = createFileRoute("/a/$handle")({
+  validateSearch:shopSearchValidator,
   loader: async ({ params, context }) => { const data = await context.queryClient.ensureQueryData(galleryQuery); const a = data.artists.find(a => a.handle === params.handle); if (!a) throw notFound(); return a; },
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
   notFoundComponent: Empty,
@@ -90,13 +98,13 @@ function Room() {
           </div>
         </Section>}
 
+        {data.roomMedia.some(m=>m.artist===handle)&&<Section id="media" title={featureCopy[lang].listen}><div className="grid gap-6 sm:grid-cols-2">{data.roomMedia.filter(m=>m.artist===handle).map(m=><RoomMediaTile key={m.id} item={m}/>)}</div></Section>}
+
         <Section id="shop" title={t.room.shop}>
           <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5">
-            {collections.map((c) => <button key={c} onClick={() => setCol(c)} className={`chip text-ink ${col === c ? "chip-on" : ""}`}>{c}</button>)}
+            {collections.map((c) => <QButton key={c} onClick={() => setCol(c)} className={`chip text-ink ${col === c ? "chip-on" : ""}`}>{c||featureCopy[lang].all}</QButton>)}
           </div>
-          <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">
-            {shop.map((p) => <div key={p.id}><PieceCard p={p} showArtist={false} /><div className="mt-2 flex flex-wrap gap-1">{p.tags.map((tg) => <span key={tg} className="label opacity-60">#{tg}</span>)}</div></div>)}
-          </div>
+          <ShopGrid rows={shop} showArtist={false}/>
         </Section>
 
         <Section id="services" title={t.room.services}>
@@ -127,7 +135,7 @@ function Room() {
         </Section>
 
         <Section id="links" title={t.room.links}>
-          <div className="mx-auto max-w-md space-y-3">{a.links.map((l) => <a key={l.label} href={l.url} className="btn btn-ghost w-full">{l.label}</a>)}</div>
+          <div className="mx-auto max-w-md space-y-3">{asRoomLinks(a.links).map((l,i) => <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="btn btn-ghost w-full"><PlatformIcon platform={l.platform}/>{l.platform==='custom'?l.label:featureCopy[lang][l.platform]}</a>)}</div>
         </Section>
 
         <Section id="faq" title={t.room.faq}>

@@ -1,30 +1,24 @@
 import { createServerFn } from '@tanstack/react-start';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
-import type { Artist, Event, RoomColor } from '@/data/sample';
-import { t } from '@/i18n/en';
-
-export const getGallery = createServerFn({ method: 'GET' }).handler(async () => {
-  const key = process.env['SUPABASE_PUBLISHABLE_KEY'];
-  const url = process.env['SUPABASE_URL'];
-  if (!key || !url) throw new Error(t.account.error);
-  const db = createClient<Database>(url, key, { auth: { persistSession: false }, global: { fetch: (input, init) => {
-    const h = new Headers(init?.headers); if (key.startsWith('sb_') && h.get('Authorization') === `Bearer ${key}`) h.delete('Authorization'); h.set('apikey', key); return fetch(input, { ...init, headers: h });
-  } } });
-  const results = await Promise.all([db.from('profiles').select('*'), db.from('rooms').select('*'), db.from('pieces').select('*'), db.from('services').select('*'), db.from('events').select('*')]);
-  for (const result of results) if (result.error) throw new Error(result.error.message);
-  const [profiles, rooms, rawPieces, rawServices, rawEvents] = results;
-  const artists = (rooms.data ?? []).map(r => {
-    const p = profiles.data?.find(p => p.id === r.id);
-    return { ...r, name: p?.display_name ?? '', city: p?.city ?? '', mediums: p?.mediums ?? [], photo: p?.photo, sample: p?.sample ?? false, room: r.room_color as RoomColor, links: r.links as Artist['links'], faq: r.faq as Artist['faq'] };
-  });
-  const handle = (id: string) => artists.find(a => a.id === id)?.handle ?? '';
-  const name = (id: string) => artists.find(a => a.id === id)?.name ?? '';
-  const pieces = (rawPieces.data ?? []).map(p => ({ ...p, artist: handle(p.artist), artistName: name(p.artist), tone: p.tone as RoomColor, price: Number(p.price), ratio: Number(p.ratio) }));
-  const services = (rawServices.data ?? []).map(s => ({ ...s, artist: handle(s.artist), artistName: name(s.artist), note: s.description, price: s.price_type === 'consult' ? `Book a $${s.price} consult` : `$${s.price}${s.price_type === 'hourly' ? ' / hour' : ''}` }));
-  const events = await Promise.all((rawEvents.data ?? []).map(async e => {
-    const spotsResult = await db.rpc('event_spots', {event_id:e.id});
-    if(spotsResult.error)throw spotsResult.error;
-    return ({ ...e, artist: handle(e.artist), artistName: name(e.artist), type: e.type as Event['type'], tone: e.tone as RoomColor, price: Number(e.price), time: `${e.start_time.slice(0,5)} – ${e.end_time.slice(0,5)} (CST)`, spots: spotsResult.data ?? 0 });}));
-  return { artists: artists.map(a => ({ ...a, firstPiece: pieces.find(p => p.artist === a.handle) })), pieces, services, events };
+import {sampleGallery,artist_mediums,artist_specialties,piece_specialties,piece_styles,piece_media,type SamplePiece} from '@/data/sample-gallery';
+import {taxonomy,type TaxonomyEntry} from '@/data/taxonomy';
+import {asRoomLinks} from './links';
+import {freeMediaLimits} from './room-media';
+import type {RoomColor} from '@/data/sample';
+import {t} from '@/i18n/en';
+export const getGallery=createServerFn({method:'GET'}).handler(async()=>{
+ const key=process.env['SUPABASE_PUBLISHABLE_KEY'];const url=process.env['SUPABASE_URL'];if(!key||!url)throw new Error(t.account.error);
+ const db=createClient<Database>(url,key,{auth:{persistSession:false},global:{fetch:(input,init)=>{const h=new Headers(init?.headers);if(key.startsWith('sb_')&&h.get('Authorization')===`Bearer ${key}`)h.delete('Authorization');h.set('apikey',key);return fetch(input,{...init,headers:h});}}});
+ const [profiles,rooms,rawPieces,services,events,tax,am,as,ps,media,settings,counts]=await Promise.all([db.from('profiles').select('*'),db.from('rooms').select('*'),db.from('pieces').select('*'),db.from('services').select('*'),db.from('events').select('*'),db.from('taxonomy').select('*'),db.from('artist_mediums').select('*'),db.from('artist_specialties').select('*'),db.from('piece_specialties').select('*'),db.from('room_media').select('*').order('sort_order'),db.from('media_settings').select('*').eq('id','free').maybeSingle(),db.rpc('public_piece_favorite_counts')]);
+ for(const result of [profiles,rooms,rawPieces,services,events,tax,am,as,ps,media,settings,counts])if(result.error)throw new Error(result.error.message);
+ const entries:TaxonomyEntry[]=[...taxonomy.filter(t=>t.kind==='format'||t.kind==='style'),...(tax.data??[]).map(row=>{const base=taxonomy.find(t=>t.id===row.id);return {...(base??{slug_es:row.slug,intro_en:'',intro_es:'',suggested_by:null,merged_into:null}),...row,kind:row.kind as TaxonomyEntry['kind'],status:row.status as TaxonomyEntry['status']};})];
+ const artists=(rooms.data??[]).map(r=>{const p=profiles.data?.find(p=>p.id===r.id);const sample=sampleGallery.artists.find(a=>a.handle===r.handle);return {...(sample??sampleGallery.artists[0]),...r,id:p?.sample?r.handle:r.id,name:p?.display_name??'',city:p?.city??'',mediums:p?.mediums??[],photo:p?.photo??null,sample:p?.sample??false,room:r.room_color as RoomColor,links:asRoomLinks(r.links),faq:Array.isArray(r.faq)?r.faq as {q:string;a:string}[]:[],firstPiece:undefined as SamplePiece|undefined};});
+ const handle=(id:string)=>rooms.data?.find(r=>r.id===id)?.handle??'';const name=(id:string)=>profiles.data?.find(p=>p.id===id)?.display_name??'';const artistId=(id:string)=>artists.find(a=>a.handle===handle(id))?.id??id;
+ const pieces:SamplePiece[]=(rawPieces.data??[]).map(p=>({...p,artist:handle(p.artist),artistName:name(p.artist),medium_id:p.medium_id??'',format_id:p.format_id,media_type:'image',edition:null,price:Number(p.price),ratio:Number(p.ratio),tone:p.tone as RoomColor,review_status:'approved'}));
+ // Preserve the existing clearly marked musician and filmmaker samples.
+ const extras=sampleGallery.artists.filter(a=>!rooms.data?.some(r=>r.handle===a.handle));pieces.push(...sampleGallery.pieces.filter(p=>extras.some(a=>a.handle===p.artist)));
+ const allArtists=[...artists,...extras].map(a=>({...a,firstPiece:pieces.find(p=>p.artist===a.handle)}));
+ const gallery={artists:allArtists,pieces,services:(services.data??[]).map(s=>({...s,artist:handle(s.artist),artistName:name(s.artist),note:s.description,price:s.price_type==='consult'?`Book a $${s.price} consult`:`$${s.price}${s.price_type==='hourly'?' / hour':''}`,medium_id:am.data?.find(a=>a.artist_id===s.artist&&a.is_main)?.medium_id??'',specialty_ids:as.data?.filter(a=>a.artist_id===s.artist).map(a=>a.specialty_id)??[]})),events:await Promise.all((events.data??[]).map(async e=>{const {data,error}=await db.rpc('event_spots',{event_id:e.id});if(error)throw error;return {...e,artist:handle(e.artist),artistName:name(e.artist),type:e.type as typeof sampleGallery.events[number]['type'],tone:e.tone as RoomColor,price:Number(e.price),time:`${e.start_time.slice(0,5)} – ${e.end_time.slice(0,5)} (CST)`,spots:data??0};}))};
+ return {...gallery,taxonomy:entries,artist_mediums:[...(am.data??[]).map(a=>({...a,artist_id:artistId(a.artist_id)})),...artist_mediums.filter(a=>extras.some(e=>e.id===a.artist_id))],artist_specialties:[...(as.data??[]).map(a=>({...a,artist_id:artistId(a.artist_id)})),...artist_specialties.filter(a=>extras.some(e=>e.id===a.artist_id))],piece_specialties:[...(ps.data??[]),...piece_specialties.filter(p=>extras.some(a=>sampleGallery.pieces.some(x=>x.id===p.piece_id&&x.artist===a.handle)))],piece_styles,piece_media,roomMedia:(media.data??[]).map(m=>({...m,artist:handle(m.artist)})),mediaLimits:settings.data??freeMediaLimits,favoriteCounts:Object.fromEntries((counts.data??[]).map(c=>[c.piece_id,Number(c.favorite_count)]))};
 });

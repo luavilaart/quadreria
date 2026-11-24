@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_mediums: {
+        Row: {
+          artist_id: string
+          is_main: boolean
+          medium_id: string
+        }
+        Insert: {
+          artist_id: string
+          is_main?: boolean
+          medium_id: string
+        }
+        Update: {
+          artist_id?: string
+          is_main?: boolean
+          medium_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_mediums_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_mediums_medium_id_fkey"
+            columns: ["medium_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_specialties: {
+        Row: {
+          artist_id: string
+          specialty_id: string
+        }
+        Insert: {
+          artist_id: string
+          specialty_id: string
+        }
+        Update: {
+          artist_id?: string
+          specialty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_specialties_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_specialties_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string
@@ -121,14 +184,95 @@ export type Database = {
         }
         Relationships: []
       }
+      media_settings: {
+        Row: {
+          audio_max_bytes: number
+          audio_max_seconds: number
+          id: string
+          video_max_bytes: number
+          video_max_seconds: number
+        }
+        Insert: {
+          audio_max_bytes?: number
+          audio_max_seconds?: number
+          id?: string
+          video_max_bytes?: number
+          video_max_seconds?: number
+        }
+        Update: {
+          audio_max_bytes?: number
+          audio_max_seconds?: number
+          id?: string
+          video_max_bytes?: number
+          video_max_seconds?: number
+        }
+        Relationships: []
+      }
+      newsletter_signups: {
+        Row: {
+          consented_at: string | null
+          created_at: string
+          marketing_opt_in: boolean
+          source: string
+          user_id: string
+        }
+        Insert: {
+          consented_at?: string | null
+          created_at?: string
+          marketing_opt_in?: boolean
+          source: string
+          user_id: string
+        }
+        Update: {
+          consented_at?: string | null
+          created_at?: string
+          marketing_opt_in?: boolean
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      piece_specialties: {
+        Row: {
+          piece_id: string
+          specialty_id: string
+        }
+        Insert: {
+          piece_id: string
+          specialty_id: string
+        }
+        Update: {
+          piece_id?: string
+          specialty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "piece_specialties_piece_id_fkey"
+            columns: ["piece_id"]
+            isOneToOne: false
+            referencedRelation: "pieces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "piece_specialties_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pieces: {
         Row: {
           artist: string
           city: string
           collection: string
+          created_at: string
+          format_id: string
           id: string
           images: string[]
           medium: string
+          medium_id: string | null
           price: number
           ratio: number
           sample: boolean
@@ -143,9 +287,12 @@ export type Database = {
           artist: string
           city?: string
           collection?: string
+          created_at?: string
+          format_id?: string
           id?: string
           images?: string[]
           medium?: string
+          medium_id?: string | null
           price?: number
           ratio?: number
           sample?: boolean
@@ -160,9 +307,12 @@ export type Database = {
           artist?: string
           city?: string
           collection?: string
+          created_at?: string
+          format_id?: string
           id?: string
           images?: string[]
           medium?: string
+          medium_id?: string | null
           price?: number
           ratio?: number
           sample?: boolean
@@ -181,6 +331,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pieces_medium_id_fkey"
+            columns: ["medium_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -190,6 +347,7 @@ export type Database = {
           display_name: string
           handle: string | null
           id: string
+          interest_medium_ids: string[]
           mediums: string[]
           photo: string | null
           sample: boolean
@@ -201,6 +359,7 @@ export type Database = {
           display_name?: string
           handle?: string | null
           id?: string
+          interest_medium_ids?: string[]
           mediums?: string[]
           photo?: string | null
           sample?: boolean
@@ -212,12 +371,66 @@ export type Database = {
           display_name?: string
           handle?: string | null
           id?: string
+          interest_medium_ids?: string[]
           mediums?: string[]
           photo?: string | null
           sample?: boolean
           user_id?: string | null
         }
         Relationships: []
+      }
+      room_media: {
+        Row: {
+          artist: string
+          cover_image: string | null
+          created_at: string
+          duration_s: number | null
+          id: string
+          kind: string
+          provider: string
+          size_bytes: number | null
+          sort_order: number
+          storage_path: string | null
+          title: string
+          url: string
+        }
+        Insert: {
+          artist: string
+          cover_image?: string | null
+          created_at?: string
+          duration_s?: number | null
+          id?: string
+          kind: string
+          provider: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path?: string | null
+          title: string
+          url: string
+        }
+        Update: {
+          artist?: string
+          cover_image?: string | null
+          created_at?: string
+          duration_s?: number | null
+          id?: string
+          kind?: string
+          provider?: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path?: string | null
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_media_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rooms: {
         Row: {
@@ -313,6 +526,47 @@ export type Database = {
           },
         ]
       }
+      taxonomy: {
+        Row: {
+          id: string
+          kind: string
+          label_en: string
+          label_es: string
+          parent_id: string | null
+          slug: string
+          sort_order: number
+          status: string
+        }
+        Insert: {
+          id: string
+          kind: string
+          label_en: string
+          label_es: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          label_en?: string
+          label_es?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxonomy_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tickets: {
         Row: {
           collector: string
@@ -384,6 +638,13 @@ export type Database = {
       }
       my_artist_social_counts: { Args: never; Returns: Json }
       owns_ticket_event: { Args: { event_id: string }; Returns: boolean }
+      public_piece_favorite_counts: {
+        Args: never
+        Returns: {
+          favorite_count: number
+          piece_id: string
+        }[]
+      }
       reserve_ticket: {
         Args: { event_id: string }
         Returns: {
@@ -399,6 +660,14 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      save_artist_taxonomy: {
+        Args: { main_id: string; medium_ids: string[]; specialty_ids: string[] }
+        Returns: undefined
+      }
+      save_piece_specialties: {
+        Args: { specialty_ids: string[]; target_piece: string }
+        Returns: undefined
       }
     }
     Enums: {

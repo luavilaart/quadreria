@@ -1,0 +1,8 @@
+import type {Database} from '@/integrations/supabase/types';
+import {mediaProvider} from '@/data/taxonomy';
+export type RoomMedia=Database['public']['Tables']['room_media']['Row'];
+export type MediaLimits=Pick<Database['public']['Tables']['media_settings']['Row'],'video_max_seconds'|'audio_max_seconds'|'video_max_bytes'|'audio_max_bytes'>;
+export const freeMediaLimits:MediaLimits={video_max_seconds:60,audio_max_seconds:300,video_max_bytes:100*1024*1024,audio_max_bytes:20*1024*1024};
+export function validateMedia(kind:'audio'|'video',seconds:number,bytes:number,limits:MediaLimits){return Number.isFinite(seconds)&&seconds>0&&bytes>0&&seconds<=(kind==='video'?limits.video_max_seconds:limits.audio_max_seconds)&&bytes<=(kind==='video'?limits.video_max_bytes:limits.audio_max_bytes);}
+export function validMediaLink(url:string){return /^https:\/\//.test(url)&&mediaProvider(url)!==null;}
+export function fileDuration(file:File):Promise<number>{return new Promise((resolve,reject)=>{const el=document.createElement(file.type.startsWith('video/')?'video':'audio');const url=URL.createObjectURL(file);const timer=setTimeout(()=>end(null),15000);const end=(duration:number|null)=>{clearTimeout(timer);URL.revokeObjectURL(url);el.removeAttribute('src');el.load();duration===null?reject(new Error('fileError')):resolve(duration);};el.preload='metadata';el.onloadedmetadata=()=>end(Number.isFinite(el.duration)?el.duration:null);el.onerror=()=>end(null);el.src=url;});}

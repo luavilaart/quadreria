@@ -1,3 +1,6 @@
+import {RoomMediaStudio} from './RoomMediaStudio';
+import {ArtistTaxonomyEditor} from './ArtistTaxonomyEditor';
+import {featureCopy} from '@/i18n/features';
 import {useState} from 'react';
 import {Link} from '@tanstack/react-router';
 import {toast} from 'sonner';

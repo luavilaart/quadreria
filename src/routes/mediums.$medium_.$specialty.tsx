@@ -1,3 +1,4 @@
+import {shopSearchValidator} from '@/lib/shop';
 import {createFileRoute,notFound} from '@tanstack/react-router';
 import {taxonomy,label,type TaxonomyEntry} from '@/data/taxonomy';
 import {galleryQuery} from '@/lib/gallery';

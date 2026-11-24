@@ -1,3 +1,5 @@
+import {LinkEditor,resolveLinks,type LinkDraft} from '@/components/q/LinkEditor';
+import {featureCopy} from '@/i18n/features';
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {useTaxonomy} from "@/components/q/TaxonomyProvider";
@@ -40,7 +42,8 @@ function Join() {
   const [want, setWant] = useState<string[]>([]);
   const [room, setRoom] = useState<RoomColor>("blush");
   const [bio, setBio] = useState("");
-  const [links, setLinks] = useState("");
+  const [links, setLinks] = useState<LinkDraft[]>([]);
+  const [marketing,setMarketing]=useState(false);
   const [city, setCity] = useState("");
   const { user, refresh } = useAccount();
   const navigate=useNavigate();
@@ -66,8 +69,9 @@ function Join() {
 
   // Mediums are picked by label in the current language; accounts store the English name.
   const mediumsEn = meds.map(m => { const e = activeEntries(state.taxonomy,"medium").find(x => label(x,lang) === m); return e ? label(e,"en") : m; });
-  const registration = {role: role ?? "collector", name, handle, city, mediums: mediumsEn, room, bio, wants: want, links: links.split("\n").filter(Boolean).map(url=>({label:url,url:url.startsWith("https://")?url:`https://${url}`}))};
-  const accountStep = {q:t.account.complete,ok:false,body:user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next="/studio" onSuccess={()=>{void refresh();setI(i+1);}}/>};
+  const registration = {role: role ?? "collector", name, handle, city, mediums: mediumsEn, room, bio, wants: want, links: resolveLinks(links).filter((l):l is NonNullable<typeof l>=>l!==null),medium_ids:meds.map(m=>activeEntries(state.taxonomy,"medium").find(x=>label(x,lang)===m)?.id??m),marketing_opt_in:marketing};
+  const newsletter=<label className="mb-5 flex items-start gap-3 text-sm"><input type="checkbox" checked={marketing} onChange={e=>setMarketing(e.target.checked)} className="mt-1 shrink-0 accent-tomato"/><span>{featureCopy[lang].marketing}</span></label>;
+  const accountStep = {q:t.account.complete,ok:false,body:<>{newsletter}{user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next="/studio" onSuccess={()=>{void refresh();setI(i+1);}}/>}</>};
   const artist = [
     { q: t.account.quiz.name, ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />
@@ -88,7 +92,7 @@ function Join() {
           <span className="mt-1 block text-xs">{t.roomColors[c.id]}</span>
         </QButton>))}</div>) },
     { q: t.account.quiz.bio, ok: bio.length > 0, body: <textarea className={inp} rows={4} maxLength={200} placeholder={t.account.quiz.bioPlaceholder} value={bio} onChange={(e) => setBio(e.target.value)} /> },
-    { q: t.account.quiz.links, ok: true, body: <textarea className={inp} rows={3} placeholder={t.account.quiz.linksPlaceholder} value={links} onChange={(e) => setLinks(e.target.value)} /> },
+    { q: t.account.quiz.links, ok: resolveLinks(links).every(Boolean), body: <><LinkEditor value={links} onChange={setLinks}/>{resolveLinks(links).some(l=>!l)&&<p role="alert" className="mt-3 text-stone">{featureCopy[lang].linkInvalid}</p>}</> },
     { q: t.account.city, ok: !!city, body: <div className="space-y-3">{cities.map(c => <Big key={c} on={city===c} onClick={()=>setCity(c)}>{f.city(c)}</Big>)}</div> },
     accountStep,
     { q: t.account.quiz.ready, ok: true, done: true, body: (
@@ -101,9 +105,7 @@ function Join() {
       </div>) },
   ];
   const collector = [
-    { q: t.account.quiz.collectorName, ok: !!name, body: <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} /> },
-    { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={v=>{if(role==="artist"&&v.length>state.settings.free.max_mediums){toast.error(c.limitError);return;}setMeds(v);}} /> },
-    { q: t.account.quiz.where, ok: !!city, body: <div className="space-y-3">{[...cities, t.account.quiz.elsewhere].map((c) => <Big key={c} on={city === c} onClick={() => setCity(c)}>{f.city(c)}</Big>)}</div> },
+    { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={setMeds} /> },
     accountStep,
     { q: `${t.account.quiz.welcome}${name ? `, ${name.split(" ")[0]}` : ""}.`, ok: true, done: true, body: <p className="text-lg text-stone">{t.account.quiz.welcomeCopy}</p> },
   ];

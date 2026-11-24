@@ -4,7 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Database, Json } from '@/integrations/supabase/types';
-export type Registration = { role: 'artist' | 'collector'; name: string; handle: string; city: string; mediums: string[]; room: string; bio: string; wants: string[]; links: {label:string;url:string}[] };
+import type {RoomLink} from '@/lib/links';
+export type Registration = { role: 'artist' | 'collector'; name: string; handle: string; city: string; mediums: string[]; room: string; bio: string; wants: string[]; links: RoomLink[]; medium_ids?:string[];specialty_ids?:string[];main_medium_id?:string;marketing_opt_in?:boolean };
 type Account = { user: User | null; profile: Database['public']['Tables']['profiles']['Row'] | null; role: 'artist' | 'collector' | null; loading:boolean; refresh: () => Promise<void> };
 const Context = createContext<Account>({ user:null, profile:null, role:null, loading:true, refresh:async()=>{} });
 export function AccountProvider({ children }: { children: ReactNode }) {

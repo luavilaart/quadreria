@@ -52,12 +52,9 @@ export const en = {
     thisWeek: "This week",
     allEvents: "All events",
     joinCard: {
-      title: "Start here",
-      intro: "Tell us who you are. A few quick questions, then your account.",
+      label: "Join as",
       artist: "I'm an artist",
-      artistNote: "Open your room, sell work, take commissions.",
       collector: "I'm a collector",
-      collectorNote: "Find art, follow artists, hire them.",
     },
     how: "How it works",
     forArtists: "For Artists",

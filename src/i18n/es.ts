@@ -69,12 +69,9 @@ export const es: Copy = {
     thisWeek: "Esta semana",
     allEvents: "Todos los eventos",
     joinCard: {
-      title: "Empezá aquí",
-      intro: "Contanos quién sos. Unas preguntas rápidas y después tu cuenta.",
+      label: "Unite como",
       artist: "Soy artista",
-      artistNote: "Abrí tu sala, vendé tu obra, aceptá encargos.",
       collector: "Soy coleccionista",
-      collectorNote: "Descubrí arte, seguí artistas, contratalos.",
     },
     how: "Cómo funciona",
     forArtists: "Para Artistas",

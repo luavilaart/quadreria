@@ -4,38 +4,26 @@ import { useAccount } from "./AccountProvider";
 import { useT } from "@/i18n";
 
 /**
- * Home "Start here" card: two doors into the join quiz, with the role already chosen.
- * Hidden for people who already finished signing up.
+ * Two big buttons beside the home tagline. Each opens the join quiz with the role
+ * already chosen; the quiz ends in sign-up. Hidden once someone has finished signing up.
  */
 export function JoinCard() {
   const t = useT();
   const { user, role } = useAccount();
   if (user && role) return null;
   const c = t.home.joinCard;
-  const doors = [
-    { role: "artist" as const, title: c.artist, note: c.artistNote },
-    { role: "collector" as const, title: c.collector, note: c.collectorNote },
-  ];
+  const base =
+    "group flex w-full items-center justify-between gap-4 rounded-full px-8 py-6 font-display text-2xl transition-transform active:scale-[0.98] sm:py-7 sm:text-3xl";
   return (
-    <aside aria-labelledby="join-card-title" className="rounded-2xl border border-line bg-card p-6 sm:p-7">
-      <h2 id="join-card-title" className="text-2xl">{c.title}</h2>
-      <p className="mt-2 text-sm text-stone">{c.intro}</p>
-      <div className="mt-5 space-y-3">
-        {doors.map((d) => (
-          <Link
-            key={d.role}
-            to="/join"
-            search={{ role: d.role }}
-            className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-wall px-5 py-4 transition-colors hover:border-ink"
-          >
-            <span>
-              <span className="font-display block text-xl">{d.title}</span>
-              <span className="mt-0.5 block text-sm text-stone">{d.note}</span>
-            </span>
-            <ArrowRight aria-hidden className="size-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        ))}
-      </div>
-    </aside>
+    <nav aria-label={c.label} className="flex flex-col gap-4">
+      <Link to="/join" search={{ role: "artist" }} className={`${base} bg-tomato text-ink hover:bg-deep-tomato`}>
+        {c.artist}
+        <ArrowRight aria-hidden className="size-7 shrink-0 transition-transform group-hover:translate-x-1" />
+      </Link>
+      <Link to="/join" search={{ role: "collector" }} className={`${base} bg-ink text-wall hover:bg-ink/90`}>
+        {c.collector}
+        <ArrowRight aria-hidden className="size-7 shrink-0 transition-transform group-hover:translate-x-1" />
+      </Link>
+    </nav>
   );
 }

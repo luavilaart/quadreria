@@ -45,7 +45,9 @@ function Room() {
   const media = all.filter(p => p.media_type !== "image");
   // "" means every collection, so an artist can still name a collection "All".
   const collections = ["", ...new Set(all.map((p) => p.collection))];
-  const [col, setCol] = useState("");
+  const {collection:col}=Route.useSearch();
+  const navigate=Route.useNavigate();
+  const setCol=(collection:string)=>void navigate({search:prev=>({...prev,collection})});
   const [salon, setSalon] = useState(true);
   const shop = all.filter((p) => isForSale(p) && (col === "" || p.collection === col));
 
@@ -87,8 +89,9 @@ function Room() {
           ) : <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">{work.map((p) => <PieceCard key={p.id} p={p} showArtist={false} />)}</div>}
         </Section>}
 
-        {media.length > 0 && <Section id="media" title={c.listen}>
+        {(media.length > 0||data.roomMedia.some(m=>m.artist===handle)) && <Section id="media" title={c.listen}>
           <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
+            {data.roomMedia.filter(m=>m.artist===handle).map(m=><RoomMediaTile key={m.id} item={m}/>)}
             {media.map((p) => (
               <div key={p.id}>
                 <div className="rounded-lg bg-paper p-2"><MediaTile p={p} /></div>
@@ -98,7 +101,6 @@ function Room() {
           </div>
         </Section>}
 
-        {data.roomMedia.some(m=>m.artist===handle)&&<Section id="media" title={featureCopy[lang].listen}><div className="grid gap-6 sm:grid-cols-2">{data.roomMedia.filter(m=>m.artist===handle).map(m=><RoomMediaTile key={m.id} item={m}/>)}</div></Section>}
 
         <Section id="shop" title={t.room.shop}>
           <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5">

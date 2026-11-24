@@ -1,3 +1,5 @@
+import {zodValidator,fallback} from '@tanstack/zod-adapter';
+import {z} from 'zod';
 import { isForSale, type TaxonomyEntry } from "./taxonomy";
 
 /**
@@ -7,6 +9,7 @@ import { isForSale, type TaxonomyEntry } from "./taxonomy";
  * - Sort: recommended, popular, new, rated, price-asc, price-desc.
  * - State lives in the URL; medium and specialty use their English slugs there.
  */
+export const browseSearchValidator=zodValidator(z.object({medium:fallback(z.string(),'').optional(),specialty:fallback(z.string(),'').optional(),city:fallback(z.string(),'').optional(),sort:fallback(z.string(),'recommended').optional(),tab:fallback(z.string(),'art').optional()}));
 export const browseTabs = ["art", "artists", "services", "events"] as const;
 export type BrowseTab = (typeof browseTabs)[number];
 export const sortKeys = ["recommended", "popular", "new", "rated", "price-asc", "price-desc"] as const;

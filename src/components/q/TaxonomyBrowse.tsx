@@ -47,7 +47,7 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
   // Recommended puts the signed-in person's quiz mediums and followed artists first.
   const { user, profile } = useAccount();
   const social = useQuery({ ...socialQuery(user?.id ?? ""), enabled: !!user });
-  const interests = (profile?.mediums ?? [])
+  const interests = profile?.interest_medium_ids.length ? profile.interest_medium_ids : (profile?.mediums ?? [])
     .map((m) => rows.find((t) => t.kind === "medium" && (t.label_en === m || t.label_es === m))?.id)
     .filter((id): id is string => !!id);
 
@@ -58,7 +58,7 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
     if (next.tab === "art") delete next.tab;
     if (next.sort === "recommended") delete next.sort;
     if (!fixed || !("medium" in patch || "specialty" in patch)) {
-      void navigate({ to: ".", search: next as never, replace: true, resetScroll: false });
+      void navigate({ to: ".", search: next, replace: true, resetScroll: false });
       return;
     }
     const { medium: mKey, specialty: sKey, ...rest } = next;
@@ -98,7 +98,7 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
       (!specialty || s.specialty_ids.includes(specialty.id)) &&
       (!city || artistCity(s.artist) === city),
   );
-  const events = data.events.filter((e) => artistMatches(e.artist) && (!city || e.city === city));
+  const events = data.events.filter((e) => artistMatches(data.artists.find(a=>a.handle===e.artist)?.id??e.artist) && (!city || e.city === city));
 
   const selector = (name: string, value: string, onChange: (v: string) => void, options: { id: string; label: string }[], all = true) => (
     <label className="min-w-0 text-sm">
@@ -125,12 +125,13 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
           </QButton>
         ))}
       </div>
-      <div className={`mt-6 grid grid-cols-2 gap-3 ${tab === "art" ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
+      <div className={`mt-6 grid grid-cols-2 gap-3 ${tab === "art" ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {selector(c.mediums, medium?.slug ?? "", (v) => set({ medium: v }), mediumOptions)}
-        {selector(c.specialties, specialty?.slug ?? "", (v) => set({ specialty: v }), specialtyOptions)}
+        
         {selector(c.city, city, (v) => set({ city: v }), cities.map((x) => ({ id: x, label: f.city(x) })))}
         {tab === "art" && selector(c.sortBy, sort, (v) => set({ sort: v as SortKey }), sortKeys.map((k) => ({ id: k, label: sortLabels[k] })), false)}
       </div>
+      {medium&&<div className="mt-4 flex flex-wrap gap-2" aria-label={c.specialties}>{[{id:'',label:c.all},...specialtyOptions].map(o=><QButton key={o.id} className={`chip ${specialty?.slug===o.id||!specialty&&o.id===''?'chip-on':''}`} aria-pressed={specialty?.slug===o.id||!specialty&&o.id===''} onClick={()=>set({specialty:o.id})}>{o.label}</QButton>)}</div>}
       <div className="mt-8">
         {tab === "art" && (pieces.length ? <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-4">{pieces.map((p) => <PieceCard key={p.id} p={p} />)}</div> : empty)}
         {tab === "artists" && (artists.length ? <div className="grid gap-4 sm:grid-cols-3">{artists.map((a) => <RoomCard key={a.id} a={a} language={lang} />)}</div> : empty)}

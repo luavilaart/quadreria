@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
-import { Wordmark } from "@/components/q/Wordmark";
+import { HeroRooms } from "@/components/q/HeroRooms";
 import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
 import { useTaxonomy } from "@/components/q/TaxonomyProvider";
@@ -27,10 +27,10 @@ function Home() {
   const { data: { artists, services, events } } = useSuspenseQuery(galleryQuery);
   return (
     <Page>
-      <section className="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:pt-24">
+      <HeroRooms />
+      <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 sm:pt-14">
         <SampleBadge />
-        <Wordmark className="mt-6 text-[clamp(3.5rem,16vw,9rem)]" />
-        <div className="molding mt-5 max-w-md" aria-hidden />
+        <div className="molding mt-6 max-w-md" aria-hidden />
         <p className="font-display mt-8 max-w-xl text-3xl leading-tight sm:text-4xl">{t.tagline}</p>
         <p className="mt-4 max-w-md text-stone">{t.home.intro}</p>
         <div className="mt-8 flex flex-wrap gap-3">

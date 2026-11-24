@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Credentials } from "@/components/q/Credentials";
+import {useTaxonomy} from "@/components/q/TaxonomyProvider";
+import {activeEntries,label} from "@/data/taxonomy";
 import { QButton } from "@/components/q/QButton";
-import { useAccount, completeRegistration } from "@/components/q/AccountProvider";
+import { useAccount } from "@/components/q/AccountProvider";
 import { toast } from "sonner";
 import { t } from "@/i18n/en";
 import { Wordmark } from "@/components/q/Wordmark";
 import { Art } from "@/components/q/Art";
-import { mediums, roomColors, cities, type RoomColor } from "@/data/sample";
+import { roomColors, cities, type RoomColor } from "@/data/sample";
 
 export const Route = createFileRoute("/join")({
   head: () => ({ meta: [
@@ -22,6 +23,8 @@ type Role = "artist" | "collector";
 const wants = t.account.quiz.wantOptions;
 
 function Join() {
+  const {state,lang,c}=useTaxonomy();
+  const mediumOptions=activeEntries(state.taxonomy,"medium").map(t=>label(t,lang));
   const [role, setRole] = useState<Role>();
   const [i, setI] = useState(0);
   const [name, setName] = useState("");
@@ -51,8 +54,8 @@ function Join() {
       <Big on={role === "collector"} onClick={() => { setRole("collector"); setI(1); }}><b className="font-display text-2xl">{t.account.quiz.collector}</b><br /><span className="text-sm opacity-75">{t.account.quiz.collectorNote}</span></Big>
     </div>) };
 
-  const registration = {role: role ?? "collector", name, handle, city, mediums: meds, room, bio, wants: want.map(w=>({"Sell my art":"sell","Show my portfolio":"portfolio","Offer services":"services","Host events":"events"}[w] ?? w)), links: links.split("\n").filter(Boolean).map(url=>({label:url,url:url.startsWith("https://")?url:`https://${url}`}))};
-  const accountStep = {q:t.account.complete,ok:false,body:user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next={role==="artist"?"/studio":"/discover"} onSuccess={()=>{void refresh();setI(i+1);}}/>};
+
+  const accountStep = {q:c.sample,ok:false,body:<QButton className="btn-primary w-full" onClick={()=>setI(i+1)}>{c.save}</QButton>};
   const artist = [
     { q: t.account.quiz.name, ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />
@@ -64,7 +67,7 @@ function Join() {
         {photo ? <img src={photo} alt={t.account.quiz.profileAlt} className="h-full w-full object-cover" /> : t.account.quiz.upload}
         <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) {setPhotoFile(f);setPhoto(URL.createObjectURL(f));} }} />
       </label>) },
-    { q: t.account.quiz.make, ok: meds.length > 0, body: <Chips list={mediums} sel={meds} set={setMeds} /> },
+    { q: t.account.quiz.make, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={v=>{if(role==="artist"&&v.length>state.settings.free.max_mediums){toast.error(c.limitError);return;}setMeds(v);}} /> },
     { q: t.account.quiz.wants, ok: want.length > 0, body: <div className="space-y-3">{wants.map((w) => <Big key={w} on={want.includes(w)} onClick={() => toggle(want, setWant, w)}>{w}</Big>)}</div> },
     { q: t.account.quiz.color, ok: true, body: (
       <div className="grid grid-cols-4 gap-3">{roomColors.map((c) => (
@@ -87,7 +90,7 @@ function Join() {
   ];
   const collector = [
     { q: t.account.quiz.collectorName, ok: !!name, body: <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} /> },
-    { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediums} sel={meds} set={setMeds} /> },
+    { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={v=>{if(role==="artist"&&v.length>state.settings.free.max_mediums){toast.error(c.limitError);return;}setMeds(v);}} /> },
     { q: t.account.quiz.where, ok: !!city, body: <div className="space-y-3">{[...cities, t.account.quiz.elsewhere].map((c) => <Big key={c} on={city === c} onClick={() => setCity(c)}>{c}</Big>)}</div> },
     accountStep,
     { q: `${t.account.quiz.welcome}${name ? `, ${name.split(" ")[0]}` : ""}.`, ok: true, done: true, body: <p className="text-lg text-stone">{t.account.quiz.welcomeCopy}</p> },

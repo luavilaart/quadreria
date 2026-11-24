@@ -1,11 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { QButton } from "@/components/q/QButton";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
-import { useAccount } from "@/components/q/AccountProvider";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { useState } from "react";
 import { Page, SampleBadge } from "@/components/q/Shell";
 import { Art } from "@/components/q/Art";
@@ -36,19 +31,10 @@ function EventPage() {
   const { e, a } = Route.useLoaderData();
   const full = e.spots === 0;
   const [done, setDone] = useState("");
-  const [busy, setBusy] = useState(false);
-  const { user, role } = useAccount();
-  const qc = useQueryClient();
-  const router = useRouter();
   async function reserve() {
-    if(role !== "collector") { toast.error(t.account.collectorOnly); return; }
-    setBusy(true);
-    const {data,error} = await supabase.rpc("reserve_ticket", {event_id:e.id});
-    setBusy(false);
-    if(error) { toast.error(error.message);return; }
-    setDone(data.status === "waitlist" ? t.account.waitlist : t.account.reserved);
-    await qc.invalidateQueries({queryKey:["gallery"]}); await router.invalidate();
+    setDone(full ? t.account.waitlist : t.account.reserved);
   }
+
   return (
     <Page>
       <div className="mx-auto max-w-3xl px-5 pt-8">
@@ -70,9 +56,7 @@ function EventPage() {
           <h2 className="text-xl">{t.event.refundTitle}</h2>
           <ul className="mt-3 space-y-2 text-sm text-stone">{t.event.refund.map((r) => <li key={r}>— {r}</li>)}</ul>
         </div>
-        {e.price > 0 ? <QButton disabled className="btn-primary mt-8 w-full">{t.event.get} · {t.account.coming}</QButton>
-          : !user ? <Link to="/auth" search={{ next: `/a/${a.handle}/e/${e.id}` }} className="btn btn-primary mt-8 w-full">{t.account.login} · {t.event.get}</Link>
-          : <QButton disabled={busy || !!done || role !== "collector"} onClick={reserve} className="btn-primary mt-8 w-full">{done || (role !== "collector" ? t.account.collectorOnly : full ? t.event.waitlist : t.event.get)}</QButton>}
+        <QButton disabled={e.price > 0 || !!done} onClick={reserve} className="btn-primary mt-8 w-full">{done || (e.price > 0 ? `${t.event.get} · ${t.account.coming}` : full ? t.event.waitlist : t.event.get)}</QButton>
 
       </div>
     </Page>

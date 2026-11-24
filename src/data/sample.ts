@@ -1,10 +1,11 @@
+import { mediumCatalog } from "@/i18n/taxonomy";
 // SAMPLE DATA — invented artists, pieces and events for the first design pass.
 export type RoomColor = "cream" | "blush" | "butter" | "sage" | "sky" | "lilac" | "ink";
 export const roomColors: { id: RoomColor; name: string }[] = [
   { id: "cream", name: "Cream" }, { id: "blush", name: "Blush" }, { id: "butter", name: "Butter" },
   { id: "sage", name: "Sage" }, { id: "sky", name: "Sky" }, { id: "lilac", name: "Lilac" }, { id: "ink", name: "Ink" },
 ];
-export const mediums = ["Painting", "Illustration", "Photography", "Ceramics", "Textiles & crochet", "Prints", "Stickers", "Graphic design", "Video"];
+export const mediums = mediumCatalog.map(m => m[2]);
 export const cities = ["Tegucigalpa", "San Pedro Sula", "Online"];
 export const eventTypes = ["Class", "Opening", "Market", "Online session"] as const;
 
@@ -25,7 +26,7 @@ export type Artist = {
 export const artists: Artist[] = [
   {
     handle: "mara", name: "Mara Quintero", tagline: "Big quiet paintings about small loud afternoons.", room: "blush",
-    city: "San Pedro Sula", mediums: ["Painting", "Prints"],
+    city: "San Pedro Sula", mediums: ["Painting"],
     bio: "I paint in a converted garage with the door open. Most of my work starts as a color I saw on a bus. (Sample artist.)",
     loves: ["Mango season", "Rothko", "Radio novelas", "Terracotta"],
     links: [{ label: "Instagram", url: "#" }, { label: "Newsletter", url: "#" }, { label: "Studio playlist", url: "#" }],
@@ -33,7 +34,7 @@ export const artists: Artist[] = [
   },
   {
     handle: "tito", name: "Tito Reyes", tagline: "Crochet, but make it architecture.", room: "sage",
-    city: "Tegucigalpa", mediums: ["Textiles & crochet", "Ceramics"],
+    city: "Tegucigalpa", mediums: ["Textile & fiber", "Sculpture & objects"],
     bio: "My grandmother taught me one stitch. I've been showing off ever since. I teach small classes every week. (Sample artist.)",
     loves: ["Wool from Intibucá", "Bauhaus", "Coffee at 6am", "Patience"],
     links: [{ label: "Instagram", url: "#" }, { label: "TikTok", url: "#" }, { label: "Pattern shop", url: "#" }],
@@ -41,7 +42,7 @@ export const artists: Artist[] = [
   },
   {
     handle: "lu", name: "Lu Ferrer", tagline: "Stickers, posters and drawings with opinions.", room: "ink",
-    city: "Online", mediums: ["Illustration", "Stickers", "Graphic design"],
+    city: "Online", mediums: ["Digital art & design", "Drawing & illustration"],
     bio: "Illustrator and designer. I draw tiny creatures with big feelings and logos for people starting something. (Sample artist.)",
     loves: ["Risograph", "Cats", "Comic shops", "Neon signs"],
     links: [{ label: "Instagram", url: "#" }, { label: "Behance", url: "#" }, { label: "YouTube", url: "#" }],

@@ -4,4 +4,7 @@
 - [x] Implement quiz signup, login, Google return, and account menu.
 - [x] Implement owner-only artist studio and collector tickets.
 - [x] Verify public pages, phone quiz layout, navigation, and live security settings (5 tests passed).
-- [ ] Verify signed-in signup, Google return, studio uploads, and ticket/check-in readback — blocked: preview login needed; temporary account approval unavailable.
+- [x] Add bilingual taxonomy types, catalog, sample migration, and shared limits.
+- [x] Update home, discovery, room cards, and bilingual medium/specialty pages.
+- [x] Add sample Studio pickers, suggestions, admin review/settings, and media tiles.
+- [x] Verify sample workflows and phone layouts; leave existing Cloud configuration untouched.

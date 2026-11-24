@@ -16,11 +16,16 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StudioRouteImport } from './routes/studio'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
-import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AHandleRouteImport } from './routes/a.$handle'
+import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
+import { Route as MediumsMediumRouteImport } from './routes/mediums.$medium'
+import { Route as EsMediosMediumRouteImport } from './routes/es.medios.$medium'
+import { Route as MediumsMediumSpecialtyRouteImport } from './routes/mediums.$medium_.$specialty'
 import { Route as AHandleEIdRouteImport } from './routes/a.$handle_.e.$id'
 import { Route as AHandlePIdRouteImport } from './routes/a.$handle_.p.$id'
+import { Route as EsMediosMediumSpecialtyRouteImport } from './routes/es.medios.$medium_.$specialty'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -56,19 +61,39 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
   id: '/my-tickets',
   path: '/my-tickets',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
-  id: '/studio',
-  path: '/studio',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AHandleRoute = AHandleRouteImport.update({
   id: '/a/$handle',
   path: '/a/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
+  id: '/admin/taxonomy',
+  path: '/admin/taxonomy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediumsMediumRoute = MediumsMediumRouteImport.update({
+  id: '/mediums/$medium',
+  path: '/mediums/$medium',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsMediosMediumRoute = EsMediosMediumRouteImport.update({
+  id: '/es/medios/$medium',
+  path: '/es/medios/$medium',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediumsMediumSpecialtyRoute = MediumsMediumSpecialtyRouteImport.update({
+  id: '/mediums/$medium_/$specialty',
+  path: '/mediums/$medium/$specialty',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AHandleEIdRoute = AHandleEIdRouteImport.update({
@@ -81,6 +106,11 @@ const AHandlePIdRoute = AHandlePIdRouteImport.update({
   path: '/a/$handle/p/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EsMediosMediumSpecialtyRoute = EsMediosMediumSpecialtyRouteImport.update({
+  id: '/es/medios/$medium_/$specialty',
+  path: '/es/medios/$medium/$specialty',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,11 +119,16 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
-  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/mediums/$medium': typeof MediumsMediumRoute
+  '/es/medios/$medium': typeof EsMediosMediumRoute
+  '/mediums/$medium/$specialty': typeof MediumsMediumSpecialtyRoute
   '/a/$handle/e/$id': typeof AHandleEIdRoute
   '/a/$handle/p/$id': typeof AHandlePIdRoute
+  '/es/medios/$medium/$specialty': typeof EsMediosMediumSpecialtyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,11 +137,16 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
-  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/mediums/$medium': typeof MediumsMediumRoute
+  '/es/medios/$medium': typeof EsMediosMediumRoute
+  '/mediums/$medium/$specialty': typeof MediumsMediumSpecialtyRoute
   '/a/$handle/e/$id': typeof AHandleEIdRoute
   '/a/$handle/p/$id': typeof AHandlePIdRoute
+  '/es/medios/$medium/$specialty': typeof EsMediosMediumSpecialtyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,11 +157,16 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
-  '/_authenticated/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
+  '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/mediums/$medium': typeof MediumsMediumRoute
+  '/es/medios/$medium': typeof EsMediosMediumRoute
+  '/mediums/$medium_/$specialty': typeof MediumsMediumSpecialtyRoute
   '/a/$handle_/e/$id': typeof AHandleEIdRoute
   '/a/$handle_/p/$id': typeof AHandlePIdRoute
+  '/es/medios/$medium_/$specialty': typeof EsMediosMediumSpecialtyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,11 +177,16 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
-    | '/my-tickets'
     | '/studio'
+    | '/my-tickets'
     | '/a/$handle'
+    | '/admin/taxonomy'
+    | '/mediums/$medium'
+    | '/es/medios/$medium'
+    | '/mediums/$medium/$specialty'
     | '/a/$handle/e/$id'
     | '/a/$handle/p/$id'
+    | '/es/medios/$medium/$specialty'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,11 +195,16 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
-    | '/my-tickets'
     | '/studio'
+    | '/my-tickets'
     | '/a/$handle'
+    | '/admin/taxonomy'
+    | '/mediums/$medium'
+    | '/es/medios/$medium'
+    | '/mediums/$medium/$specialty'
     | '/a/$handle/e/$id'
     | '/a/$handle/p/$id'
+    | '/es/medios/$medium/$specialty'
   id:
     | '__root__'
     | '/'
@@ -159,11 +214,16 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
+    | '/studio'
     | '/_authenticated/my-tickets'
-    | '/_authenticated/studio'
     | '/a/$handle'
+    | '/admin/taxonomy'
+    | '/mediums/$medium'
+    | '/es/medios/$medium'
+    | '/mediums/$medium_/$specialty'
     | '/a/$handle_/e/$id'
     | '/a/$handle_/p/$id'
+    | '/es/medios/$medium_/$specialty'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -174,9 +234,15 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   JoinRoute: typeof JoinRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  StudioRoute: typeof StudioRoute
   AHandleRoute: typeof AHandleRoute
+  AdminTaxonomyRoute: typeof AdminTaxonomyRoute
+  MediumsMediumRoute: typeof MediumsMediumRoute
+  EsMediosMediumRoute: typeof EsMediosMediumRoute
+  MediumsMediumSpecialtyRoute: typeof MediumsMediumSpecialtyRoute
   AHandleEIdRoute: typeof AHandleEIdRoute
   AHandlePIdRoute: typeof AHandlePIdRoute
+  EsMediosMediumSpecialtyRoute: typeof EsMediosMediumSpecialtyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -230,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/my-tickets': {
       id: '/_authenticated/my-tickets'
       path: '/my-tickets'
@@ -237,18 +310,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/studio': {
-      id: '/_authenticated/studio'
-      path: '/studio'
-      fullPath: '/studio'
-      preLoaderRoute: typeof AuthenticatedStudioRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/a/$handle': {
       id: '/a/$handle'
       path: '/a/$handle'
       fullPath: '/a/$handle'
       preLoaderRoute: typeof AHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/taxonomy': {
+      id: '/admin/taxonomy'
+      path: '/admin/taxonomy'
+      fullPath: '/admin/taxonomy'
+      preLoaderRoute: typeof AdminTaxonomyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mediums/$medium': {
+      id: '/mediums/$medium'
+      path: '/mediums/$medium'
+      fullPath: '/mediums/$medium'
+      preLoaderRoute: typeof MediumsMediumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es/medios/$medium': {
+      id: '/es/medios/$medium'
+      path: '/es/medios/$medium'
+      fullPath: '/es/medios/$medium'
+      preLoaderRoute: typeof EsMediosMediumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mediums/$medium_/$specialty': {
+      id: '/mediums/$medium_/$specialty'
+      path: '/mediums/$medium/$specialty'
+      fullPath: '/mediums/$medium/$specialty'
+      preLoaderRoute: typeof MediumsMediumSpecialtyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/a/$handle_/e/$id': {
@@ -265,17 +359,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AHandlePIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/es/medios/$medium_/$specialty': {
+      id: '/es/medios/$medium_/$specialty'
+      path: '/es/medios/$medium/$specialty'
+      fullPath: '/es/medios/$medium/$specialty'
+      preLoaderRoute: typeof EsMediosMediumSpecialtyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
-  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
-  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -289,9 +388,15 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   JoinRoute: JoinRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  StudioRoute: StudioRoute,
   AHandleRoute: AHandleRoute,
+  AdminTaxonomyRoute: AdminTaxonomyRoute,
+  MediumsMediumRoute: MediumsMediumRoute,
+  EsMediosMediumRoute: EsMediosMediumRoute,
+  MediumsMediumSpecialtyRoute: MediumsMediumSpecialtyRoute,
   AHandleEIdRoute: AHandleEIdRoute,
   AHandlePIdRoute: AHandlePIdRoute,
+  EsMediosMediumSpecialtyRoute: EsMediosMediumSpecialtyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

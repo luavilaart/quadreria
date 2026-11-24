@@ -3,7 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
 import { Wordmark } from "@/components/q/Wordmark";
 import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
-import { galleryQuery, mediums } from "@/lib/gallery";
+import { galleryQuery } from "@/lib/gallery";
+import { useTaxonomy } from "@/components/q/TaxonomyProvider";
+import { activeEntries, label } from "@/data/taxonomy";
 import { t } from "@/i18n/en";
 
 export const Route = createFileRoute("/")({
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const {state,lang,c}=useTaxonomy();
   const { data: { artists, services, events } } = useSuspenseQuery(galleryQuery);
   return (
     <Page>
@@ -37,9 +40,9 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-5">
-        <p className="label mb-3 text-stone">{t.home.byMedium}</p>
+        <p className="label mb-3 text-stone">{c.byMedium}</p>
         <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-2">
-          {mediums.map((m) => <Link key={m} to="/discover" search={{ medium: m }} className="chip hover:border-ink">{m}</Link>)}
+          {activeEntries(state.taxonomy,"medium").map(m => lang === "es" ? <Link key={m.id} to="/es/medios/$medium" params={{medium:m.slug_es}} className="chip hover:border-ink">{label(m,lang)}</Link> : <Link key={m.id} to="/mediums/$medium" params={{medium:m.slug}} className="chip hover:border-ink">{label(m,lang)}</Link>)}
         </div>
       </section>
 

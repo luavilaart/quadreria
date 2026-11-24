@@ -1,6 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader, SiteFooter, SampleBadge } from "@/components/q/Shell";
+import {MediaTile} from "@/components/q/MediaTile";
+import {useTaxonomy} from "@/components/q/TaxonomyProvider";
+import {isForSale,label} from "@/data/taxonomy";
 import { Art } from "@/components/q/Art";
 import { PieceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
@@ -22,14 +25,15 @@ export const Route = createFileRoute("/a/$handle")({
 });
 
 function Room() {
+  const {state,lang,c}=useTaxonomy();
   const { handle } = Route.useParams();
   const { data } = useSuspenseQuery(galleryQuery);
   const a = data.artists.find(a => a.handle === handle);
-  const work = data.pieces.filter(p => p.artist === handle);
+  const work = data.pieces.filter(p => p.artist === handle && p.review_status === "approved");
   const collections = ["All", ...new Set(work.map((p) => p.collection))];
   const [col, setCol] = useState("All");
   const [salon, setSalon] = useState(true);
-  const shop = work.filter((p) => col === "All" || p.collection === col);
+  const shop = work.filter((p) => isForSale(p) && (col === "All" || p.collection === col));
 
   if (!a) return null;
   return (
@@ -43,6 +47,7 @@ function Room() {
           <p className="label mt-6 opacity-70">@{a.handle} · {a.city}</p>
           <h1 className="mt-2 text-5xl leading-none sm:text-7xl">{a.name}</h1>
           <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
+          <p className="mt-3 text-sm">{state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-3">{label(t,lang)}{t.status==="pending"?" · "+c.pending:""}</span>:null)}</p>
           <div className="mt-6 hidden gap-3 sm:flex">
             <a href="#services" className="btn btn-primary">{t.room.hire}</a>
             <a href="#shop" className="btn btn-ghost">{t.room.shop}</a>
@@ -59,9 +64,9 @@ function Room() {
           {salon ? (
             <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-8">
               {work.map((p, i) => (
-                <Link key={p.id} to="/a/$handle/p/$id" params={{ handle: a.handle, id: p.id }} style={{ width: `${[38, 52, 30, 44][i % 4]}%`, marginTop: i % 2 ? 24 : 0 }} className="max-w-xs">
-                  <div className="rounded-lg bg-paper p-2"><Art src={p.images[0]} ratio={p.ratio} tone={p.tone} shape={p.shape} title={p.title} /></div>
-                </Link>
+                <div key={p.id} style={{ width: `${[38, 52, 30, 44][i % 4]}%`, marginTop: i % 2 ? 24 : 0 }} className="max-w-xs">
+                  <div className="rounded-lg bg-paper p-2"><MediaTile p={p}/></div><Link to="/a/$handle/p/$id" params={{handle:a.handle,id:p.id}} className="mt-2 block text-sm">{p.title}</Link><p className="mt-1 text-xs">{state.piece_styles.filter(s=>s.piece_id===p.id).map(s=>state.taxonomy.find(t=>t.id===s.style_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-2">{label(t,lang)}</span>:null)}</p>
+                </div>
               ))}
             </div>
           ) : <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">{work.map((p) => <PieceCard key={p.id} p={p} showArtist={false} />)}</div>}

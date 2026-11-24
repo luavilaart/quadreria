@@ -26,6 +26,14 @@ function About() {
             <div className="mt-8 space-y-5 text-lg leading-relaxed text-stone">
               {a.body.map((p) => <p key={p}>{p}</p>)}
             </div>
+            <h2 className="mt-12 text-2xl sm:text-3xl">{a.nameTitle}</h2>
+            <p className="mt-4 text-lg leading-relaxed text-stone">{a.name}</p>
+            <h2 className="mt-12 text-2xl sm:text-3xl">{a.whyTitle}</h2>
+            <div className="mt-4 space-y-5 text-lg leading-relaxed text-stone">
+              {a.why.map((p) => <p key={p}>{p}</p>)}
+            </div>
+            <p className="font-display mt-8 text-xl sm:text-2xl">{a.founders}</p>
+            <p className="mt-4 text-lg leading-relaxed text-stone">{a.where}</p>
           </div>
           <div className="space-y-4 lg:pt-4">
             {[[a.forArtistsTitle, a.forArtists], [a.forCollectorsTitle, a.forCollectors]].map(([h, p]) => (

@@ -18,6 +18,7 @@ export const es: Copy = {
     join: "Unite",
     studio: "Estudio",
     about: "Nosotros",
+    menu: "Menú",
   },
   about: {
     metaTitle: "Nosotros",
@@ -25,9 +26,16 @@ export const es: Copy = {
     title: "Sobre quadreria",
     body: [
       "quadreria es una galería en línea donde cada artista tiene su propia sala. Los coleccionistas entran, miran con calma, compran obra original e impresiones, contratan al artista para encargos y consiguen entradas a sus clases e inauguraciones.",
-      "En italiano, una quadreria es una sala llena de cuadros. Esa es la idea: una sala por artista, colgada como a cada quien le guste.",
-      "Empezamos en Honduras, en Tegucigalpa y San Pedro Sula, y después abrimos al resto del mundo.",
     ],
+    nameTitle: "Qué significa el nombre",
+    name: "Quadreria viene del italiano quadro, un cuadro. Una quadreria es una galería de pinturas: las salas de los palacios antiguos donde los cuadros colgaban de pared a pared. Nos quedamos con la idea y le dimos a cada artista una de esas salas, colgada como más le guste.",
+    whyTitle: "Por qué empezamos",
+    why: [
+      "Los artistas merecen vivir de su arte. Mucha obra buena pasa desapercibida o se vende por muy poco, así que quadreria está hecha para que los artistas tengan ingresos reales: por sus piezas, sus encargos y sus eventos.",
+      "El arte también tiene que estar al alcance. Encontrar a un artista local, ver su obra y comprarla debería tomar unos cuantos toques, no un contacto con suerte.",
+    ],
+    founders: "quadreria fue fundada por mujeres LGBTQ+.",
+    where: "Empezamos en Honduras, en Tegucigalpa y San Pedro Sula, y después abrimos al resto del mundo.",
     forArtistsTitle: "Para artistas",
     forArtists: "Abrir tu sala es gratis. Vos ponés tus precios, enviás tu obra y elegís qué mostrar.",
     forCollectorsTitle: "Para coleccionistas",

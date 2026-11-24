@@ -65,6 +65,13 @@ function Room() {
           <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
           <FollowButton artist={a.handle}/>
           <p className="mt-3 text-sm">{state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-3">{label(t,lang)}{t.status==="pending"?" · "+c.pending:""}</span>:null)}</p>
+          {asRoomLinks(a.links).length > 0 && (
+            <ul aria-label={t.room.links} className="mt-4 flex flex-wrap gap-2">
+              {asRoomLinks(a.links).map((l, i) => (
+                <li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer" className="chip text-ink hover:border-ink"><PlatformIcon platform={l.platform} />{l.platform === "custom" ? l.label : featureCopy[lang][l.platform]}</a></li>
+              ))}
+            </ul>
+          )}
           <div className="mt-6 hidden gap-3 sm:flex">
             <a href="#services" className="btn btn-primary">{t.room.hire}</a>
             <a href="#shop" className="btn btn-ghost">{t.room.shop}</a>

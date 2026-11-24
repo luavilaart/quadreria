@@ -5,6 +5,7 @@ import { Eye } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { studioQuery } from "@/lib/studio";
 import { label } from "@/data/taxonomy";
+import { asRoomLinks } from "@/lib/links";
 import type { RoomColor } from "@/data/sample";
 import { useT } from "@/i18n";
 import { QButton } from "./QButton";
@@ -37,6 +38,7 @@ export function StudioRoomPreview() {
           bio: d.room.bio,
           room: asRoomColor(d.room.room_color),
           photo: d.profile.photo,
+          links: asRoomLinks(d.room.links),
           mediums: d.profile.mediums.map((m) => {
             const entry = state.taxonomy.find((x) => x.kind === "medium" && (x.label_en === m || x.label_es === m || x.id === m));
             return entry ? label(entry, lang) : m;

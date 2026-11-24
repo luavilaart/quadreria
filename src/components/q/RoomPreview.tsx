@@ -1,4 +1,8 @@
 import { Art } from "./Art";
+import { PlatformIcon } from "./LinkEditor";
+import { useTaxonomy } from "./TaxonomyProvider";
+import { featureCopy } from "@/i18n/features";
+import type { RoomLink } from "@/lib/links";
 import { cn } from "@/lib/utils";
 import { useFormat, useT } from "@/i18n";
 import type { RoomColor } from "@/data/sample";
@@ -17,6 +21,7 @@ export type PreviewRoomData = {
   mediums?: string[] | undefined;
   pieces?: PreviewPiece[] | undefined;
   services?: PreviewService[] | undefined;
+  links?: RoomLink[] | undefined;
 };
 
 const salonWidths = ["w-[42%]", "w-[50%]", "w-[38%]", "w-[46%]"];
@@ -29,6 +34,7 @@ export function RoomPreview({ data, className, height = "h-[640px]" }: { data: P
   const t = useT();
   const f = useFormat();
   const p = t.preview;
+  const { lang } = useTaxonomy();
   const pieces = (data.pieces ?? []).slice(0, 8);
   const money = (n: number) => f.price(n === 0 ? 0 : n);
   const servicePrice = (s: PreviewService) =>
@@ -49,6 +55,13 @@ export function RoomPreview({ data, className, height = "h-[640px]" }: { data: P
           </div>
           {(data.tagline || data.bio) && <p className="mt-3 text-xs leading-relaxed opacity-85">{data.tagline || data.bio}</p>}
           {!!data.mediums?.length && <p className="mt-2 text-[11px]">{data.mediums.join(" · ")}</p>}
+          {!!data.links?.length && (
+            <ul aria-label={t.room.links} className="mt-3 flex flex-wrap gap-1.5">
+              {data.links.map((l, i) => (
+                <li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-full border border-line bg-card px-2.5 py-1 text-[11px] text-ink [&_svg]:size-3"><PlatformIcon platform={l.platform} />{l.platform === "custom" ? l.label : featureCopy[lang][l.platform]}</a></li>
+              ))}
+            </ul>
+          )}
 
           <p className="font-display mt-5 text-lg">{t.room.work}</p>
           <div className="mt-2 flex flex-wrap items-end justify-center gap-x-2 gap-y-3">

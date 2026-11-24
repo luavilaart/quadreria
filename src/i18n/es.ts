@@ -20,6 +20,10 @@ export const es: Copy = {
     about: "Nosotros",
     menu: "Menú",
   },
+  cityPicker: {
+    hint: "O escribí cualquier ciudad del mundo.",
+    placeholder: "Tu ciudad",
+  },
   preview: {
     readySub: "Así la van a ver los coleccionistas.",
     firstPiece: "Tu primera pieza",

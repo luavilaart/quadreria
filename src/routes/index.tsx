@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { Page, SectionTitle, SampleBadge } from "@/components/q/Shell";
 import { HeroVideo } from "@/components/q/HeroVideo";
 import { JoinCard } from "@/components/q/JoinCard";
@@ -36,10 +37,6 @@ function Home() {
         <p className="font-display mt-6 max-w-xl text-3xl leading-tight sm:text-4xl">{t.tagline}</p>
         <div className="molding mt-5 max-w-md" aria-hidden />
         <p className="mt-5 max-w-md text-stone">{t.home.intro}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link to="/discover" className="btn btn-primary">{t.home.findArt}</Link>
-          <Link to="/join" className="btn btn-ghost">{t.home.openRoom}</Link>
-        </div>
         </div>
         <JoinCard />
       </section>
@@ -71,17 +68,27 @@ function Home() {
       <section className="mx-auto mt-16 max-w-6xl px-5">
         <SectionTitle title={t.home.how} />
         <div className="grid gap-4 sm:grid-cols-2">
-          {[[t.home.forArtists, t.home.artistSteps], [t.home.forCollectors, t.home.collectorSteps]].map(([h, steps]) => (
-            <div key={h as string} className="rounded-2xl border border-line bg-card p-6">
-              <h3 className="text-xl">{h as string}</h3>
-              <ol className="mt-4 space-y-3">
-                {(steps as string[]).map((s, i) => <li key={s} className="flex gap-3"><span className="font-display text-deep-tomato">{i + 1}</span><span>{s}</span></li>)}
-              </ol>
-            </div>
-          ))}
+          <HowCard title={t.home.forArtists} steps={t.home.artistSteps}>
+            <Link to="/join" search={{ role: "artist" }} className="btn btn-ghost">{t.home.openRoom}</Link>
+          </HowCard>
+          <HowCard title={t.home.forCollectors} steps={t.home.collectorSteps}>
+            <Link to="/discover" className="btn btn-primary">{t.home.findArt}</Link>
+          </HowCard>
         </div>
       </section>
     </Page>
+  );
+}
+
+function HowCard({ title, steps, children }: { title: string; steps: string[]; children: ReactNode }) {
+  return (
+    <div className="flex flex-col rounded-2xl border border-line bg-card p-6">
+      <h3 className="text-xl">{title}</h3>
+      <ol className="mt-4 flex-1 space-y-3">
+        {steps.map((s, i) => <li key={s} className="flex gap-3"><span className="font-display text-deep-tomato">{i + 1}</span><span>{s}</span></li>)}
+      </ol>
+      <div className="mt-6">{children}</div>
+    </div>
   );
 }
 

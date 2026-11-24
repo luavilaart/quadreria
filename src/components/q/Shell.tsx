@@ -21,11 +21,11 @@ export function SiteHeader() {
         <Link to="/" className="text-2xl"><Wordmark /></Link>
         <nav className="flex flex-wrap items-center gap-3 text-sm">
           <QButton aria-label={lang==="en"?"Español":"English"} onClick={()=>setLang(lang==="en"?"es":"en")} className="!px-2 !py-1 text-xs">{lang==="en"?"ES":"EN"}</QButton>
-          {user&&<Link to="/discover" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.art}</Link>}
-          {user&&<Link to="/studio" className="hover:text-deep-tomato">{c.studio}</Link>}
-          {user&&<Link to="/events" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.events}</Link>}
+          <Link to="/discover" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.art}</Link>
+          <Link to="/events" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.events}</Link>
+          <Link to="/about" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{t.nav.about}</Link>
           {!user ? <><Link to="/auth" search={{next:"/"}} className="hover:text-deep-tomato">{c.login}</Link><Link to="/join" className="btn btn-primary !px-4 !py-2 text-sm">{c.join}</Link></> :
-            <DropdownMenu><DropdownMenuTrigger asChild><QButton className="!px-3 !py-2 text-sm btn-ghost">{t.account.account}</QButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={()=>void logout()}>{t.account.logout}</DropdownMenuItem></DropdownMenuContent></DropdownMenu>}
+            <><Link to="/studio" className="hover:text-deep-tomato" activeProps={{ className: "text-deep-tomato" }}>{c.studio}</Link><DropdownMenu><DropdownMenuTrigger asChild><QButton className="!px-3 !py-2 text-sm btn-ghost">{t.account.account}</QButton></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={()=>void logout()}>{t.account.logout}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></>}
         </nav>
       </div>
     </header>
@@ -40,7 +40,7 @@ export function SiteFooter() {
         <Wordmark className="text-3xl" />
         <p className="mt-2 text-stone">{t.tagline}</p>
         <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm">
-          {t.footer.map((f) => <li key={f}><a href="#" className="hover:text-deep-tomato">{f}</a></li>)}
+          {t.footer.map((f, i) => <li key={f}>{i === 0 ? <Link to="/about" className="hover:text-deep-tomato">{f}</Link> : <a href="#" className="hover:text-deep-tomato">{f}</a>}</li>)}
         </ul>
         <p className="label mt-10 text-stone">© 2026 quadreria · {t.sampleShown}</p>
       </div>

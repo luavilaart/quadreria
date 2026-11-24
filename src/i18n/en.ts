@@ -7,7 +7,22 @@ export const en = {
   sample: "Sample data",
   sampleShown: "Sample data shown throughout",
   lang: { label: "Language", es: "Español", en: "English", short: { es: "ES", en: "EN" } },
-  nav: { discover: "Discover", events: "Events", join: "Join", studio: "Studio" },
+  nav: { discover: "Discover", events: "Events", join: "Join", studio: "Studio", about: "About us" },
+  about: {
+    metaTitle: "About us",
+    metaDescription: "quadreria is an online gallery where every artist has a room. Starting in Honduras.",
+    title: "About quadreria",
+    body: [
+      "quadreria is an online gallery where every artist gets a room of their own. Collectors walk in, look around, buy original work and prints, hire the artist for commissions, and get tickets to their classes and openings.",
+      "In Italian, a quadreria is a room full of paintings. That is the idea: one room per artist, hung the way they like it.",
+      "We are starting in Honduras, in Tegucigalpa and San Pedro Sula, and opening to the rest of the world after that.",
+    ],
+    forArtistsTitle: "For artists",
+    forArtists: "Opening a room is free. You set your prices, ship your own work and choose what to show.",
+    forCollectorsTitle: "For collectors",
+    forCollectors: "Buy directly from the person who made it, hire them for something new, or meet them at an event.",
+    join: "Come in",
+  },
   meta: {
     rootTitle: "quadreria — Hire the artist, not the gig.",
     rootDescription: "An online gallery where every artist has a room. Buy art, hire artists, join their events.",

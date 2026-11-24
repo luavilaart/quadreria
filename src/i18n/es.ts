@@ -17,6 +17,22 @@ export const es: Copy = {
     events: "Eventos",
     join: "Unite",
     studio: "Estudio",
+    about: "Nosotros",
+  },
+  about: {
+    metaTitle: "Nosotros",
+    metaDescription: "quadreria es una galería en línea donde cada artista tiene su sala. Empezamos en Honduras.",
+    title: "Sobre quadreria",
+    body: [
+      "quadreria es una galería en línea donde cada artista tiene su propia sala. Los coleccionistas entran, miran con calma, compran obra original e impresiones, contratan al artista para encargos y consiguen entradas a sus clases e inauguraciones.",
+      "En italiano, una quadreria es una sala llena de cuadros. Esa es la idea: una sala por artista, colgada como a cada quien le guste.",
+      "Empezamos en Honduras, en Tegucigalpa y San Pedro Sula, y después abrimos al resto del mundo.",
+    ],
+    forArtistsTitle: "Para artistas",
+    forArtists: "Abrir tu sala es gratis. Vos ponés tus precios, enviás tu obra y elegís qué mostrar.",
+    forCollectorsTitle: "Para coleccionistas",
+    forCollectors: "Comprale directo a quien la hizo, contratalo para algo nuevo o conocelo en un evento.",
+    join: "Pasá adelante",
   },
   meta: {
     rootTitle: "quadreria — Contratá al artista, no la chamba.",

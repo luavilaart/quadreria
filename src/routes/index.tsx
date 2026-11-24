@@ -6,12 +6,12 @@ import { RoomCard, ServiceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
 import { useTaxonomy } from "@/components/q/TaxonomyProvider";
 import { activeEntries, label } from "@/data/taxonomy";
-import { t } from "@/i18n/en";
+import { useT } from "@/i18n";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
+  notFoundComponent: Empty,
   head: () => ({ meta: [
     { title: "quadreria — Hire the artist, not the gig." },
     { name: "description", content: "Walk into artists' rooms. Buy originals and prints, hire artists, and get tickets to their classes and openings." },
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const {state,lang,c}=useTaxonomy();
+  const t = useT();
   const { data: { artists, services, events } } = useSuspenseQuery(galleryQuery);
   return (
     <Page>
@@ -47,7 +48,7 @@ function Home() {
       </section>
 
       <section className="mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle kicker="Featured" title={t.home.featured} />
+        <SectionTitle kicker={t.home.featuredKicker} title={t.home.featured} />
         <div className="grid gap-4 sm:grid-cols-3">{artists.map((a) => <RoomCard key={a.handle} a={a} />)}</div>
       </section>
 
@@ -59,7 +60,7 @@ function Home() {
       </section>
 
       <section className="mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle title={t.home.thisWeek} action={<Link to="/events" className="link text-sm">All events</Link>} />
+        <SectionTitle title={t.home.thisWeek} action={<Link to="/events" className="link text-sm">{t.home.allEvents}</Link>} />
         <div className="grid gap-3 sm:grid-cols-2">{events.map((e) => <EventCard key={e.id} e={e} />)}</div>
       </section>
 
@@ -79,3 +80,5 @@ function Home() {
     </Page>
   );
 }
+
+function Empty() { return <p>{useT().account.empty}</p>; }

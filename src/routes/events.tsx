@@ -1,25 +1,26 @@
-import { t } from "@/i18n/en";
+import { copyFor, langOf, useFormat, useT } from "@/i18n";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Page } from "@/components/q/Shell";
 import { EventCard } from "@/components/q/Cards";
-import { galleryQuery, cities, eventTypes, fmtDate } from "@/lib/gallery";
+import { galleryQuery, cities, eventTypes } from "@/lib/gallery";
 
 export const Route = createFileRoute("/events")({
   loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
-  head: () => ({ meta: [
-    { title: "Events calendar — quadreria" }, { name: "description", content: "Classes, openings, markets and online sessions hosted by artists." },
-    { property: "og:title", content: "Events — quadreria" }, { property: "og:description", content: "Classes, openings, markets and online sessions." },
+  notFoundComponent: Empty,
+  head: ({ match }) => { const t = copyFor(langOf(match.context)); return { meta: [
+    { title: `${t.meta.eventsTitle} — quadreria` }, { name: "description", content: t.meta.eventsDescription },
+    { property: "og:title", content: `${t.events.title} — quadreria` }, { property: "og:description", content: t.meta.eventsShare },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  ] }; },
   component: Events,
 });
 
 function Events() {
   const { data: { events } } = useSuspenseQuery(galleryQuery);
+  const t = useT(); const f = useFormat();
   const [city, setCity] = useState<string>();
   const [type, setType] = useState<string>();
   const list = events.filter((e) => (!city || e.city === city) && (!type || e.type === type)).sort((a, b) => a.date.localeCompare(b.date));
@@ -27,18 +28,18 @@ function Events() {
   return (
     <Page>
       <div className="mx-auto max-w-3xl px-5 pt-10">
-        <h1 className="text-4xl">Events</h1>
-        <p className="mt-2 text-stone">Meet the artist in person, or from your couch.</p>
+        <h1 className="text-4xl">{t.events.title}</h1>
+        <p className="mt-2 text-stone">{t.events.intro}</p>
         <div className="no-scrollbar -mx-5 mt-6 flex gap-2 overflow-x-auto px-5">
-          <F on={!city} on2={() => setCity(undefined)}>All cities</F>{cities.map((c) => <F key={c} on={city === c} on2={() => setCity(c)}>{c}</F>)}
+          <F on={!city} on2={() => setCity(undefined)}>{t.events.allCities}</F>{cities.map((c) => <F key={c} on={city === c} on2={() => setCity(c)}>{f.city(c)}</F>)}
         </div>
         <div className="no-scrollbar -mx-5 mt-2 flex gap-2 overflow-x-auto px-5">
-          <F on={!type} on2={() => setType(undefined)}>All types</F>{eventTypes.map((c) => <F key={c} on={type === c} on2={() => setType(c)}>{c}</F>)}
+          <F on={!type} on2={() => setType(undefined)}>{t.events.allTypes}</F>{eventTypes.map((c) => <F key={c} on={type === c} on2={() => setType(c)}>{f.eventType(c)}</F>)}
         </div>
-        {dates.length === 0 && <p className="mt-12 text-center text-stone">Nothing on that combo yet.</p>}
+        {dates.length === 0 && <p className="mt-12 text-center text-stone">{t.events.empty}</p>}
         {dates.map((d) => (
           <section key={d} className="mt-10">
-            <h2 className="mb-3 border-b border-line pb-2 text-xl">{fmtDate(d, { weekday: "long", month: "long", day: "numeric" })}</h2>
+            <h2 className="mb-3 border-b border-line pb-2 text-xl">{f.date(d, { weekday: "long", month: "long", day: "numeric" })}</h2>
             <div className="space-y-3">{list.filter((e) => e.date === d).map((e) => <EventCard key={e.id} e={e} />)}</div>
           </section>
         ))}
@@ -47,3 +48,5 @@ function Events() {
   );
 }
 const F = ({ on, on2, children }: { on: boolean; on2: () => void; children: React.ReactNode }) => <button onClick={on2} aria-pressed={on} className={`chip ${on ? "chip-on" : ""}`}>{children}</button>;
+
+function Empty() { return <p>{useT().account.empty}</p>; }

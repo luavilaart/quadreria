@@ -9,7 +9,7 @@ import {isForSale,label} from "@/data/taxonomy";
 import { Art } from "@/components/q/Art";
 import { PieceCard } from "@/components/q/Cards";
 import { galleryQuery, usd } from "@/lib/gallery";
-import { t } from "@/i18n/en";
+import { useFormat, useT } from "@/i18n";
 
 export const Route = createFileRoute("/a/$handle_/p/$id")({
   loader: async ({ params, context }) => {
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/a/$handle_/p/$id")({
     return { p, a };
   },
   errorComponent: ({ error }) => <p role="alert">{error instanceof Error ? error.message : String(error)}</p>,
-  notFoundComponent: () => <p>{t.account.empty}</p>,
+  notFoundComponent: Empty,
   head: ({ loaderData: d }) => ({ meta: d ? [
     { title: `${d.p.title} by ${d.a.name} — quadreria` }, { name: "description", content: `${d.p.medium}, ${d.p.size}. ${usd(d.p.price)}.` },
     { property: "og:title", content: `${d.p.title} — ${d.a.name}` }, { property: "og:description", content: `${d.p.medium} on quadreria` },
@@ -32,6 +32,7 @@ export const Route = createFileRoute("/a/$handle_/p/$id")({
 
 function PiecePage() {
   const {state,lang,c}=useTaxonomy();
+  const t = useT(); const f = useFormat();
   useSuspenseQuery(galleryQuery);
   const { p, a } = Route.useLoaderData();
   const { data } = useSuspenseQuery(galleryQuery);
@@ -45,15 +46,15 @@ function PiecePage() {
           {p.sample && <SampleBadge />}
           <Link to="/a/$handle" params={{ handle: a.handle }} className="link mt-4 block text-sm">{a.name}</Link>
           <h1 className="mt-1 text-4xl">{p.title}</h1>
-          <p className="mt-3 text-2xl font-medium">{isForSale(p)?usd(p.price):p.format_id==="format:digital-download"?c.coming:c.showcase}</p>
+          <p className="mt-3 text-2xl font-medium">{isForSale(p)?f.price(p.price):p.format_id==="format:digital-download"?c.coming:c.showcase}</p>
            <p className="mt-2 text-sm">{state.taxonomy.filter(t=>t.id===p.format_id).map(t=>label(t,lang))}{p.edition?` · ${c.edition}: ${p.edition}`:""}</p>
            <p className="mt-2 text-sm">{state.piece_styles.filter(s=>s.piece_id===p.id).map(s=>state.taxonomy.find(t=>t.id===s.style_id)).filter(t=>t?.status==="active").map(t=>t?<span key={t.id} className="mr-2">{label(t,lang)}</span>:null)}</p>
           <dl className="mt-6 divide-y divide-line border-y border-line text-sm">
-            {[[t.piece.medium, p.medium], [t.piece.size, p.size], [t.piece.ships, p.city === "Online" ? "Tegucigalpa, Honduras" : `${p.city}, Honduras`]].map(([k, v]) => (
+            {[[t.piece.medium, f.medium(p.medium)], [t.piece.size, p.size], [t.piece.ships, p.city === "Online" ? "Tegucigalpa, Honduras" : `${p.city}, Honduras`]].map(([k, v]) => (
               <div key={k} className="flex justify-between py-3"><dt className="label text-stone">{k}</dt><dd>{v}</dd></div>
             ))}
           </dl>
-          <p className="mt-4 text-sm text-stone">Packed by the artist and shipped within 5 days. Shipping is calculated at checkout.</p>
+          <p className="mt-4 text-sm text-stone">{t.piece.shipping}</p>
           {isForSale(p)&&<QButton disabled className="btn-primary mt-6 w-full">{t.piece.add} · {t.account.coming}</QButton>}
         </div>
       </div>
@@ -64,3 +65,5 @@ function PiecePage() {
     </Page>
   );
 }
+
+function Empty() { return <p>{useT().account.empty}</p>; }

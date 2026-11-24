@@ -69,7 +69,10 @@ function Home() {
         <SectionTitle title={t.home.how} />
         <div className="grid gap-4 sm:grid-cols-2">
           <HowCard title={t.home.forArtists} steps={t.home.artistSteps}>
-            <Link to="/join" search={{ role: "artist" }} className="btn btn-ghost">{t.home.openRoom}</Link>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link to="/join" search={{ role: "artist" }} className="btn btn-ghost">{t.home.openRoom}</Link>
+              <Link to="/example-room" className="link">{t.preview.seeExample}</Link>
+            </div>
           </HowCard>
           <HowCard title={t.home.forCollectors} steps={t.home.collectorSteps}>
             <Link to="/discover" className="btn btn-primary">{t.home.findArt}</Link>

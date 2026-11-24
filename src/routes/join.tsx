@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { useFormat, useT } from "@/i18n";
 import { Wordmark } from "@/components/q/Wordmark";
 import { Art } from "@/components/q/Art";
+import { RoomPreview } from "@/components/q/RoomPreview";
+import { X } from "lucide-react";
 import { roomColors, cities, type RoomColor } from "@/data/sample";
 
 export const Route = createFileRoute("/join")({
@@ -50,6 +52,7 @@ function Join() {
   async function enterStudio(){const saved=sessionStorage.getItem('quadreria-next');sessionStorage.removeItem('quadreria-next');await navigate({to:saved?.startsWith('/')&&!saved.startsWith('//')?saved:'/studio'});}
   const [photoFile,setPhotoFile]=useState<File>();
   const [photo, setPhoto] = useState<string>();
+  const [popOpen, setPopOpen] = useState(true);
 
   const toggle = (arr: string[], set: (v: string[]) => void, v: string) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
   const inp = "w-full rounded-2xl border border-line bg-card px-5 py-4 text-lg";
@@ -95,14 +98,11 @@ function Join() {
     { q: t.account.quiz.links, ok: resolveLinks(links).every(Boolean), body: <><LinkEditor value={links} onChange={setLinks}/>{resolveLinks(links).some(l=>!l)&&<p role="alert" className="mt-3 text-stone">{featureCopy[lang].linkInvalid}</p>}</> },
     { q: t.account.city, ok: !!city, body: <div className="space-y-3">{cities.map(c => <Big key={c} on={city===c} onClick={()=>setCity(c)}>{f.city(c)}</Big>)}</div> },
     accountStep,
-    { q: t.account.quiz.ready, ok: true, done: true, body: (
-      <div className={`room-${room} rounded-2xl bg-room p-6 text-room-fg`}>
-        <p className="label opacity-70">@{handle || t.account.quiz.you}</p>
-        <h2 className="mt-1 text-4xl">{name || t.account.quiz.namePlaceholder}</h2>
-        <p className="mt-2 opacity-85">{bio || t.account.quiz.bioEmpty}</p>
-        <div className="mt-5 grid grid-cols-3 items-end gap-3"><Art ratio={4 / 5} tone="cream" shape={0} /><Art ratio={1} tone="butter" shape={2} /><Art ratio={2 / 3} tone="sky" shape={1} /></div>
-        <p className="label mt-5 opacity-70">{meds.join(" · ")}</p>
-      </div>) },
+    { q: t.account.quiz.ready, ok: true, done: true, preview: true, body: (
+      <>
+        <p className="-mt-4 mb-6 text-stone">{t.preview.readySub}</p>
+        <RoomPreview data={{ name, handle, city, bio, room, photo, mediums: meds }} height="h-[min(560px,62dvh)]" />
+      </>) },
   ];
   const collector = [
     { q: t.account.quiz.loves, ok: meds.length > 0, body: <Chips list={mediumOptions} sel={meds} set={setMeds} /> },
@@ -112,6 +112,8 @@ function Join() {
   const steps = [roleStep, ...(role === "collector" ? collector : artist)];
   const s = steps[i] ?? roleStep;
   const done = "done" in s && s.done;
+  // The artist's last step shows their room with a pop-up pointing to the Studio.
+  const showPop = "preview" in s && !!s.preview && popOpen;
 
   return (
     <div className="flex min-h-[100dvh] flex-col">
@@ -122,11 +124,26 @@ function Join() {
       <main key={i} className="mx-auto flex w-full max-w-lg flex-1 flex-col px-5 py-10 animate-in fade-in slide-in-from-right-4">
         <h1 className="text-4xl leading-tight">{s.q}</h1>
         <div className="mt-8 flex-1">{s.body}</div>
-        <div className="sticky bottom-0 flex gap-3 bg-wall py-4">
+        {showPop ? (
+          <div role="dialog" aria-modal="false" aria-labelledby="room-pop-title" className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-lg rounded-3xl bg-ink p-5 text-wall animate-in fade-in slide-in-from-bottom-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p id="room-pop-title" className="font-display text-2xl">{t.preview.popTitle}</p>
+                <p className="mt-1 text-sm opacity-85">{t.preview.popBody}</p>
+              </div>
+              <QButton aria-label={t.preview.close} title={t.preview.close} onClick={() => setPopOpen(false)} className="-mr-2 -mt-2 !h-11 !w-11 shrink-0 !p-0 text-wall"><X className="!size-5" /></QButton>
+            </div>
+            <div className="mt-4 flex gap-3">
+              {user ? <QButton onClick={() => void enterStudio()} className="btn-primary flex-1">{t.preview.popEdit}</QButton>
+                : <Link to="/auth" search={{ next: "/studio" }} className="btn btn-primary flex-1">{t.preview.popEdit}</Link>}
+              <QButton onClick={() => setPopOpen(false)} className="btn-ghost text-wall">{t.preview.popLater}</QButton>
+            </div>
+          </div>
+        ) : <div className="sticky bottom-0 flex gap-3 bg-wall py-4">
           {i > 0 && <QButton onClick={() => setI(i - 1)} className="btn btn-ghost">{t.account.quiz.back}</QButton>}
           {done ? user?<QButton onClick={()=>void enterStudio()} className="btn btn-primary flex-1">{t.account.quiz.studio}</QButton>:<Link to="/discover" className="btn btn-primary flex-1">{t.account.quiz.explore}</Link>
             : i > 0 && <QButton disabled={!s.ok} onClick={() => setI(i + 1)} className="btn btn-primary flex-1 disabled:opacity-40">{t.account.quiz.next}</QButton>}
-        </div>
+        </div>}
       </main>
     </div>
   );

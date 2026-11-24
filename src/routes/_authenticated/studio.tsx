@@ -4,6 +4,7 @@ import { pageHead } from '@/lib/head';
 import { supabase } from '@/integrations/supabase/client';
 import { TaxonomyStudio } from '@/components/q/TaxonomyStudio';
 import { CollectorStudio } from '@/components/q/CollectorStudio';
+import { StudioRoomPreview } from '@/components/q/StudioRoomPreview';
 import { socialCopy } from '@/i18n/social';
 import { langOf } from '@/i18n';
 import { studioDestination } from '@/lib/social';
@@ -22,4 +23,4 @@ export const Route=createFileRoute('/_authenticated/studio')({
  head:({match})=>{const c=socialCopy[langOf(match.context)];return pageHead(c.title,c.description);},
  component:Studio,
 });
-function Studio(){const {studioRole}=Route.useRouteContext();return studioRole==='artist'?<TaxonomyStudio/>:<CollectorStudio/>;}
+function Studio(){const {studioRole}=Route.useRouteContext();return studioRole==='artist'?<><TaxonomyStudio/><StudioRoomPreview/></>:<CollectorStudio/>;}

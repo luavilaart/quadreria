@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as ExampleRoomRouteImport } from './routes/example-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
@@ -55,6 +56,11 @@ const DiscoverRoute = DiscoverRouteImport.update({
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExampleRoomRoute = ExampleRoomRouteImport.update({
+  id: '/example-room',
+  path: '/example-room',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
+  '/example-room': typeof ExampleRoomRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
+  '/example-room': typeof ExampleRoomRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
+  '/example-room': typeof ExampleRoomRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/events'
+    | '/example-room'
     | '/join'
     | '/reset-password'
     | '/my-tickets'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/events'
+    | '/example-room'
     | '/join'
     | '/reset-password'
     | '/my-tickets'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/events'
+    | '/example-room'
     | '/join'
     | '/reset-password'
     | '/_authenticated/my-tickets'
@@ -245,6 +257,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
   EventsRoute: typeof EventsRoute
+  ExampleRoomRoute: typeof ExampleRoomRoute
   JoinRoute: typeof JoinRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AHandleRoute: typeof AHandleRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/example-room': {
+      id: '/example-room'
+      path: '/example-room'
+      fullPath: '/example-room'
+      preLoaderRoute: typeof ExampleRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -408,6 +428,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
   EventsRoute: EventsRoute,
+  ExampleRoomRoute: ExampleRoomRoute,
   JoinRoute: JoinRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AHandleRoute: AHandleRoute,

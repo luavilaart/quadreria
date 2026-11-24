@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page } from "@/components/q/Shell";
 import { JoinCard } from "@/components/q/JoinCard";
 import { pageHead } from "@/lib/head";
@@ -36,10 +36,11 @@ function About() {
             <p className="mt-4 text-lg leading-relaxed text-stone">{a.where}</p>
           </div>
           <div className="space-y-4 lg:pt-4">
-            {[[a.forArtistsTitle, a.forArtists], [a.forCollectorsTitle, a.forCollectors]].map(([h, p]) => (
+            {[[a.forArtistsTitle, a.forArtists], [a.forCollectorsTitle, a.forCollectors]].map(([h, p], i) => (
               <div key={h} className="rounded-2xl border border-line bg-card p-6">
                 <h2 className="text-xl">{h}</h2>
                 <p className="mt-2 text-stone">{p}</p>
+                {i === 0 && <Link to="/example-room" className="link mt-3 inline-block">{t.preview.seeExample}</Link>}
               </div>
             ))}
           </div>
@@ -47,6 +48,7 @@ function About() {
         <section className="mt-16 max-w-xl">
           <h2 className="mb-5 text-3xl">{a.join}</h2>
           <JoinCard />
+          <Link to="/example-room" className="link mt-6 inline-block text-lg">{t.preview.seeExample}</Link>
         </section>
       </div>
     </Page>

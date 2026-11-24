@@ -10,6 +10,7 @@ import { Art } from "@/components/q/Art";
 import { PieceCard } from "@/components/q/Cards";
 import { galleryQuery, usd } from "@/lib/gallery";
 import { useFormat, useT } from "@/i18n";
+import { FavoriteButton } from '@/components/q/SocialActions';
 
 export const Route = createFileRoute("/a/$handle_/p/$id")({
   loader: async ({ params, context }) => {
@@ -45,7 +46,7 @@ function PiecePage() {
         <div>
           {p.sample && <SampleBadge />}
           <Link to="/a/$handle" params={{ handle: a.handle }} className="link mt-4 block text-sm">{a.name}</Link>
-          <h1 className="mt-1 text-4xl">{p.title}</h1>
+          <div className="mt-1 flex items-start justify-between gap-3"><h1 className="text-4xl">{p.title}</h1><FavoriteButton piece={p.id}/></div>
           <p className="mt-3 text-2xl font-medium">{isForSale(p)?f.price(p.price):p.format_id==="format:digital-download"?c.coming:c.showcase}</p>
            <p className="mt-2 text-sm">{state.taxonomy.filter(t=>t.id===p.format_id).map(t=>label(t,lang))}{p.edition?` · ${c.edition}: ${p.edition}`:""}</p>
            <p className="mt-2 text-sm">{state.piece_styles.filter(s=>s.piece_id===p.id).map(s=>state.taxonomy.find(t=>t.id===s.style_id)).filter(t=>t?.status==="active").map(t=>t?<span key={t.id} className="mr-2">{label(t,lang)}</span>:null)}</p>

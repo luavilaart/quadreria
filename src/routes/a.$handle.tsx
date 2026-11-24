@@ -10,6 +10,7 @@ import { galleryQuery } from "@/lib/gallery";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createContext, useContext, type ReactNode } from "react";
 import { useFormat, useT } from "@/i18n";
+import { FavoriteButton, FollowButton } from '@/components/q/SocialActions';
 
 export const Route = createFileRoute("/a/$handle")({
   loader: async ({ params, context }) => { const data = await context.queryClient.ensureQueryData(galleryQuery); const a = data.artists.find(a => a.handle === params.handle); if (!a) throw notFound(); return a; },
@@ -49,6 +50,7 @@ function Room() {
           <p className="label mt-6 opacity-70">@{a.handle} · {f.city(a.city)}</p>
           <h1 className="mt-2 text-5xl leading-none sm:text-7xl">{a.name}</h1>
           <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
+          <FollowButton artist={a.handle}/>
           <p className="mt-3 text-sm">{state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-3">{label(t,lang)}{t.status==="pending"?" · "+c.pending:""}</span>:null)}</p>
           <div className="mt-6 hidden gap-3 sm:flex">
             <a href="#services" className="btn btn-primary">{t.room.hire}</a>
@@ -67,7 +69,7 @@ function Room() {
             <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-8">
               {work.map((p, i) => (
                 <div key={p.id} style={{ width: `${[38, 52, 30, 44][i % 4]}%`, marginTop: i % 2 ? 24 : 0 }} className="max-w-xs">
-                  <div className="rounded-lg bg-paper p-2"><MediaTile p={p}/></div><Link to="/a/$handle/p/$id" params={{handle:a.handle,id:p.id}} className="mt-2 block text-sm">{p.title}</Link><p className="mt-1 text-xs">{state.piece_styles.filter(s=>s.piece_id===p.id).map(s=>state.taxonomy.find(t=>t.id===s.style_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-2">{label(t,lang)}</span>:null)}</p>
+                  <div className="rounded-lg bg-paper p-2"><MediaTile p={p}/></div><div className="flex items-start justify-between gap-2"><Link to="/a/$handle/p/$id" params={{handle:a.handle,id:p.id}} className="mt-2 block text-sm">{p.title}</Link><FavoriteButton piece={p.id}/></div><p className="mt-1 text-xs">{state.piece_styles.filter(s=>s.piece_id===p.id).map(s=>state.taxonomy.find(t=>t.id===s.style_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-2">{label(t,lang)}</span>:null)}</p>
                 </div>
               ))}
             </div>

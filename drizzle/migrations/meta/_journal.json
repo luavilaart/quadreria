@@ -36,6 +36,13 @@
       "when": 1795155228615,
       "tag": "0004_nonrecursive_ticket_access",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795494283385,
+      "tag": "0005_private_favorites_and_follows",
+      "breakpoints": true
     }
   ]
 }

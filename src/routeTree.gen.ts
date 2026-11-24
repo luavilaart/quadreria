@@ -16,8 +16,8 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as StudioRouteImport } from './routes/studio'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AHandleRouteImport } from './routes/a.$handle'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
 import { Route as MediumsMediumRouteImport } from './routes/mediums.$medium'
@@ -61,14 +61,14 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudioRoute = StudioRouteImport.update({
-  id: '/studio',
-  path: '/studio',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
   id: '/my-tickets',
   path: '/my-tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AHandleRoute = AHandleRouteImport.update({
@@ -119,8 +119,8 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/studio': typeof StudioRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/mediums/$medium': typeof MediumsMediumRoute
@@ -137,8 +137,8 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/studio': typeof StudioRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/mediums/$medium': typeof MediumsMediumRoute
@@ -157,8 +157,8 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/join': typeof JoinRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/studio': typeof StudioRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/_authenticated/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
   '/mediums/$medium': typeof MediumsMediumRoute
@@ -177,8 +177,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
-    | '/studio'
     | '/my-tickets'
+    | '/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
     | '/mediums/$medium'
@@ -195,8 +195,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
-    | '/studio'
     | '/my-tickets'
+    | '/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
     | '/mediums/$medium'
@@ -214,8 +214,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/join'
     | '/reset-password'
-    | '/studio'
     | '/_authenticated/my-tickets'
+    | '/_authenticated/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
     | '/mediums/$medium'
@@ -234,7 +234,6 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   JoinRoute: typeof JoinRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  StudioRoute: typeof StudioRoute
   AHandleRoute: typeof AHandleRoute
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
   MediumsMediumRoute: typeof MediumsMediumRoute
@@ -296,18 +295,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/studio': {
-      id: '/studio'
-      path: '/studio'
-      fullPath: '/studio'
-      preLoaderRoute: typeof StudioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/my-tickets': {
       id: '/_authenticated/my-tickets'
       path: '/my-tickets'
       fullPath: '/my-tickets'
       preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/a/$handle': {
@@ -371,10 +370,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
+  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -388,7 +389,6 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   JoinRoute: JoinRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  StudioRoute: StudioRoute,
   AHandleRoute: AHandleRoute,
   AdminTaxonomyRoute: AdminTaxonomyRoute,
   MediumsMediumRoute: MediumsMediumRoute,

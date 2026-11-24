@@ -36,7 +36,8 @@ use the editor.
 - Gallery buttons use the unstyled design-system variant so existing pill styling remains unchanged.
 - Roles are immutable after transactional registration in user_roles; profiles never carry permissions.
 - Ticket reservation and check-in use database functions with locks and ownership checks, preventing overbooking and browser privilege changes.
-- The sample Studio and Taxonomy review are public demo routes; real tickets retain their authenticated layout, and public taxonomy pages remain crawlable.
+- Studio is a single role-aware route under the authenticated layout; taxonomy review and taxonomy browsing remain public, and legacy tickets links redirect to Studio.
+- Favorites and follows persist in Cloud using canonical gallery piece IDs and artist handles, including sample media; RLS limits rows to their creator and a caller-scoped RPC exposes only artist-owned aggregate counts.
 - Artist room colors are `.room-<id>` classes setting --room/--room-fg, used via bg-room/text-room-fg — one template, many walls.
 - Taxonomy IDs and normalized joins are the canonical sample relationships; validate selections and upload limits in shared pure helpers so future server enforcement reuses the same rules.
 - Taxonomy media tiles mount raw media or external embeds only after playback starts and coordinate one active player; covers remain lightweight on the wall.

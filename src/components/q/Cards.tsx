@@ -6,19 +6,20 @@ import type {Language} from "@/i18n/taxonomy";
 import { Art } from "./Art";
 import { type Event, type Piece, type Service, type Artist } from "@/lib/gallery";
 import { useFormat, useT } from "@/i18n";
+import { FavoriteButton } from './SocialActions';
 
 export function PieceCard({ p, showArtist = true }: { p: Piece; showArtist?: boolean }) {
   const f = useFormat();
   return (
     <div className="group block">
       {p.media_type === "image" ? <Link to="/a/$handle/p/$id" params={{handle:p.artist,id:p.id}}><MediaTile p={p}/></Link> : <MediaTile p={p}/>}
-      <Link to="/a/$handle/p/$id" params={{ handle: p.artist, id: p.id }}>
+      <div className="flex items-start justify-between gap-1"><Link className="min-w-0 flex-1" to="/a/$handle/p/$id" params={{ handle: p.artist, id: p.id }}>
       <div className="mt-2 flex items-baseline justify-between gap-2">
         <h3 className="text-base leading-tight">{p.title}</h3>
         <span className="text-sm font-medium">{isForSale(p) ? f.price(p.price) : ""}</span>
       </div>
       {showArtist && <p className="text-xs text-stone">{p.artistName}</p>}
-      </Link>
+      </Link><FavoriteButton piece={p.id}/></div>
     </div>
   );
 }

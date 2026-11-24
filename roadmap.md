@@ -8,3 +8,6 @@
 - [x] Update home, discovery, room cards, and bilingual medium/specialty pages.
 - [x] Add sample Studio pickers, suggestions, admin review/settings, and media tiles.
 - [x] Verify sample workflows and phone layouts; leave existing Cloud configuration untouched.
+- [ ] Make Studio private and role-aware; preserve the Artist dashboard and redirect old tickets links.
+- [ ] Add private favorites/follows, sign-in prompts, and anonymous artist counts.
+- [ ] Verify saved art and following end-to-end, security rules, and 390px layouts.

@@ -85,6 +85,42 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          collector: string
+          created_at: string
+          piece: string
+        }
+        Insert: {
+          collector: string
+          created_at?: string
+          piece: string
+        }
+        Update: {
+          collector?: string
+          created_at?: string
+          piece?: string
+        }
+        Relationships: []
+      }
+      follows: {
+        Row: {
+          artist: string
+          collector: string
+          created_at: string
+        }
+        Insert: {
+          artist: string
+          collector: string
+          created_at?: string
+        }
+        Update: {
+          artist?: string
+          collector?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       pieces: {
         Row: {
           artist: string
@@ -346,6 +382,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_artist_social_counts: { Args: never; Returns: Json }
       owns_ticket_event: { Args: { event_id: string }; Returns: boolean }
       reserve_ticket: {
         Args: { event_id: string }

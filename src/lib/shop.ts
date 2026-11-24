@@ -8,6 +8,7 @@ export function validateShopSearch(s:Record<string,unknown>):ShopSearch {const s
 export type RankedPiece={id:string;artist:string;medium_id:string;price:number;created_at:string;format_id:string;status:string};
 export type Ranking={counts:Record<string,number>;interests:readonly string[];followed:readonly string[];ratings?:Record<string,number|null>};
 export function sortPieces<P extends RankedPiece>(rows:readonly P[],mode:string,r:Ranking):P[] {
+ mode=mode==='new'?'newest':mode==='price-asc'?'priceAsc':mode==='price-desc'?'priceDesc':mode;
  const popular=(p:P)=>r.counts[p.id]??0;const date=(p:P)=>Date.parse(p.created_at)||0;
  const price=mode==='priceAsc'||mode==='priceDesc';
  const filtered=price?rows.filter(p=>p.format_id!=='format:showcase-only'&&p.format_id!=='format:digital-download'):rows;

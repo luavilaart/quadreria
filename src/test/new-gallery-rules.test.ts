@@ -2,8 +2,15 @@ import {describe,it,expect} from 'vitest';
 import {sortPieces,validateShopSearch,type RankedPiece} from '@/lib/shop';
 import {normalizeLink} from '@/lib/links';
 import {validateMedia,freeMediaLimits} from '@/lib/room-media';
+import {registrationInput} from '@/lib/registration';
 const pieces:RankedPiece[]=[{id:'older',artist:'mara',medium_id:'medium:painting',price:50,created_at:'2026-11-01',format_id:'format:original',status:'available'},{id:'new',artist:'lu',medium_id:'medium:digital-art-design',price:10,created_at:'2026-11-20',format_id:'format:print',status:'available'},{id:'show',artist:'tito',medium_id:'medium:textile-fiber',price:0,created_at:'2026-11-22',format_id:'format:showcase-only',status:'available'}];
 const ranking={counts:{older:10,new:1,show:0},interests:[],followed:[]};
+describe('Quiz registration',()=>{
+ it('never opts a collector into marketing by default',()=>expect(registrationInput({role:'collector',name:''}).marketing_opt_in).toBe(false));
+ it('never opts an artist into marketing by default',()=>expect(registrationInput({role:'artist',name:'Mara'}).marketing_opt_in).toBe(false));
+ it('keeps an explicit agreement',()=>expect(registrationInput({role:'collector',name:'',marketing_opt_in:true}).marketing_opt_in).toBe(true));
+ it('uses the email prefix as a temporary collector name',()=>expect(registrationInput({role:'collector',name:''},'luciana@example.com').name).toBe('luciana'));
+});
 describe('Shop sorting',()=>{
  it('ranks matching quiz interests before unmatched pieces',()=>expect(sortPieces(pieces,'recommended',{...ranking,interests:['medium:digital-art-design']})[0]?.id).toBe('new'));
  it('ranks followed artists before unmatched pieces',()=>expect(sortPieces(pieces,'recommended',{...ranking,followed:['tito']})[0]?.id).toBe('show'));

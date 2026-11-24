@@ -13,7 +13,7 @@ export function useShopState(initialMedium='',initialSpecialty=''){
  const {state}=useTaxonomy();const raw=useSearch({strict:false});const search=validateShopSearch(raw as Record<string,unknown>);const navigate=useNavigate();
  const medium=state.taxonomy.find(t=>t.kind==='medium'&&[t.id,t.slug,t.label_en].includes(search.medium||initialMedium))?.id??'';
  const specialty=state.taxonomy.find(t=>t.kind==='specialty'&&t.parent_id===medium&&[t.id,t.slug].includes(search.specialty||initialSpecialty))?.id??'';
- const change=(patch:Partial<ShopSearch>)=>void navigate({search:prev=>({...prev,...patch})});
+ const change=(patch:Partial<ShopSearch>)=>void navigate({to:'.',search:prev=>({...prev,...patch}),resetScroll:false});
  return {search:{...search,medium,specialty},change};
 }
 export function ShopFilters({search,change,sort=true,language}:{search:ShopSearch;change:(p:Partial<ShopSearch>)=>void;sort?:boolean;language?:'en'|'es'}){

@@ -11,8 +11,8 @@
 - [x] Make Studio private and role-aware; preserve the Artist dashboard and redirect old tickets links.
 - [x] Add private favorites/follows, sign-in prompts, and identity-free artist counts.
 - [x] Verify saved art and following end-to-end, security rules, and 390px layouts.
-- [ ] Persist bilingual taxonomy, normalized selections, sample remapping, and creation dates.
-- [ ] Add shared URL-based Medium/Specialty/City filters and six sorting modes.
-- [ ] Add owner-managed room media, storage, settings-based limits, and Lu's sample link.
-- [ ] Add structured platform links, short Collector quiz, and private newsletter consent.
-- [ ] Verify rules, signed-in changes, playback, and 390px layouts; commit changes.
+- [x] Persist bilingual taxonomy, normalized selections, sample remapping, and creation dates.
+- [x] Add shared URL-based Medium/Specialty/City filters and six sorting modes.
+- [x] Add owner-managed room media, storage, settings-based limits, and Lu's sample link.
+- [x] Add structured platform links, short Collector quiz, and private newsletter consent.
+- [x] Verify rules, signed-in changes, playback, and 390px layouts; commit changes.

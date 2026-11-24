@@ -64,6 +64,13 @@
       "when": 1795495533379,
       "tag": "0008_validate_piece_specialties",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795495765416,
+      "tag": "0009_include_public_media_sample_favorites",
+      "breakpoints": true
     }
   ]
 }

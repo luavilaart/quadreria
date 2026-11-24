@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Database, Json } from '@/integrations/supabase/types';
 import type {RoomLink} from '@/lib/links';
+import {registrationInput} from '@/lib/registration';
 export type Registration = { role: 'artist' | 'collector'; name: string; handle: string; city: string; mediums: string[]; room: string; bio: string; wants: string[]; links: RoomLink[]; medium_ids?:string[];specialty_ids?:string[];main_medium_id?:string;marketing_opt_in?:boolean };
 type Account = { user: User | null; profile: Database['public']['Tables']['profiles']['Row'] | null; role: 'artist' | 'collector' | null; loading:boolean; refresh: () => Promise<void> };
 const Context = createContext<Account>({ user:null, profile:null, role:null, loading:true, refresh:async()=>{} });
@@ -17,6 +18,6 @@ export function AccountProvider({ children }: { children: ReactNode }) {
  return <Context.Provider value={{user,profile,role,loading,refresh}}>{children}</Context.Provider>;
 }
 export const useAccount=()=>useContext(Context);
-export async function completeRegistration(payload: Registration) { const {error}=await supabase.rpc('complete_registration',{payload:payload as unknown as Json});if(error)throw error; }
+export async function completeRegistration(payload: Registration) { const {error}=await supabase.rpc('complete_registration',{payload:registrationInput(payload) as unknown as Json});if(error)throw error; }
 /** tooLarge is the message shown when the file is not an image under 10 MB (pass t.account.uploadError). */
 export async function uploadImage(bucket:string,userId:string,file:File,tooLarge:string) { if(!file.type.startsWith('image/')||file.size>10*1024*1024)throw new Error(tooLarge);const path=`${userId}/${crypto.randomUUID()}.${file.name.split('.').pop()}`;const {error}=await supabase.storage.from(bucket).upload(path,file);if(error)throw error;return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl; }

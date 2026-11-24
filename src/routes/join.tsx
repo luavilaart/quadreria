@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {useTaxonomy} from "@/components/q/TaxonomyProvider";
 import { Credentials } from "@/components/q/Credentials";
@@ -43,6 +43,8 @@ function Join() {
   const [links, setLinks] = useState("");
   const [city, setCity] = useState("");
   const { user, refresh } = useAccount();
+  const navigate=useNavigate();
+  async function enterStudio(){const saved=sessionStorage.getItem('quadreria-next');sessionStorage.removeItem('quadreria-next');await navigate({to:saved?.startsWith('/')&&!saved.startsWith('//')?saved:'/studio'});}
   const [photoFile,setPhotoFile]=useState<File>();
   const [photo, setPhoto] = useState<string>();
 
@@ -65,7 +67,7 @@ function Join() {
   // Mediums are picked by label in the current language; accounts store the English name.
   const mediumsEn = meds.map(m => { const e = activeEntries(state.taxonomy,"medium").find(x => label(x,lang) === m); return e ? label(e,"en") : m; });
   const registration = {role: role ?? "collector", name, handle, city, mediums: mediumsEn, room, bio, wants: want, links: links.split("\n").filter(Boolean).map(url=>({label:url,url:url.startsWith("https://")?url:`https://${url}`}))};
-  const accountStep = {q:t.account.complete,ok:false,body:user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next={role==="artist"?"/studio":"/discover"} onSuccess={()=>{void refresh();setI(i+1);}}/>};
+  const accountStep = {q:t.account.complete,ok:false,body:user?<QButton className="btn-primary w-full" onClick={async()=>{try{await completeRegistration(registration);await refresh();setI(i+1);}catch(e){toast.error(e instanceof Error?e.message:t.account.error);}}}>{t.account.create}</QButton>:<Credentials registration={registration} photo={photoFile} next="/studio" onSuccess={()=>{void refresh();setI(i+1);}}/>};
   const artist = [
     { q: t.account.quiz.name, ok: !!name && !!handle, body: (<div className="space-y-3">
       <input className={inp} placeholder={t.account.quiz.namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />
@@ -120,7 +122,7 @@ function Join() {
         <div className="mt-8 flex-1">{s.body}</div>
         <div className="sticky bottom-0 flex gap-3 bg-wall py-4">
           {i > 0 && <QButton onClick={() => setI(i - 1)} className="btn btn-ghost">{t.account.quiz.back}</QButton>}
-          {done ? <Link to={role === "artist" ? "/studio" : "/discover"} className="btn btn-primary flex-1">{role === "artist" ? t.account.quiz.studio : t.account.quiz.explore}</Link>
+          {done ? user?<QButton onClick={()=>void enterStudio()} className="btn btn-primary flex-1">{t.account.quiz.studio}</QButton>:<Link to="/discover" className="btn btn-primary flex-1">{t.account.quiz.explore}</Link>
             : i > 0 && <QButton disabled={!s.ok} onClick={() => setI(i + 1)} className="btn btn-primary flex-1 disabled:opacity-40">{t.account.quiz.next}</QButton>}
         </div>
       </main>

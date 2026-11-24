@@ -6,6 +6,7 @@ import { TaxonomyStudio } from '@/components/q/TaxonomyStudio';
 import { CollectorStudio } from '@/components/q/CollectorStudio';
 import { socialCopy } from '@/i18n/social';
 import { langOf } from '@/i18n';
+import { studioDestination } from '@/lib/social';
 
 export const Route=createFileRoute('/_authenticated/studio')({
  beforeLoad:async()=>{
@@ -13,6 +14,7 @@ export const Route=createFileRoute('/_authenticated/studio')({
   if(error||!u.user)throw redirect({to:'/auth',search:{next:'/studio'}});
   const {data,error:roleError}=await supabase.from('user_roles').select('role').eq('user_id',u.user.id).maybeSingle();
   if(roleError)throw roleError;
+  if(studioDestination(data?.role??null)==='/join')throw redirect({to:'/join'});
   if(!data)throw redirect({to:'/join'});
   return {studioRole:data.role};
  },

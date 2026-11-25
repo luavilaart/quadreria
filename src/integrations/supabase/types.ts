@@ -47,6 +47,64 @@ export type Database = {
           },
         ]
       }
+      artist_plans: {
+        Row: {
+          artist: string
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          artist: string
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          artist?: string
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_plans_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_shipping_zones: {
+        Row: {
+          artist: string
+          currency: string
+          rate: number | null
+          ships: boolean
+          zone: string
+        }
+        Insert: {
+          artist: string
+          currency?: string
+          rate?: number | null
+          ships?: boolean
+          zone: string
+        }
+        Update: {
+          artist?: string
+          currency?: string
+          rate?: number | null
+          ships?: boolean
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_shipping_zones_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_specialties: {
         Row: {
           artist_id: string
@@ -77,6 +135,35 @@ export type Database = {
           },
         ]
       }
+      event_views: {
+        Row: {
+          event: string
+          id: string
+          viewed_on: string
+          visitor: string
+        }
+        Insert: {
+          event: string
+          id?: string
+          viewed_on?: string
+          visitor: string
+        }
+        Update: {
+          event?: string
+          id?: string
+          viewed_on?: string
+          visitor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_views_event_fkey"
+            columns: ["event"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string
@@ -84,19 +171,26 @@ export type Database = {
           blurb: string
           bring: string[]
           capacity: number
+          category: string
           city: string
           cover_image: string | null
           date: string
+          end_date: string | null
           end_time: string
           id: string
+          invite_theme: Json
           online_link: string
           price: number
           sample: boolean
           start_time: string
           status: string
+          timezone: string
           title: string
           tone: string
           type: string
+          updated_at: string
+          venue_name: string
+          visibility: string
         }
         Insert: {
           address?: string
@@ -104,19 +198,26 @@ export type Database = {
           blurb?: string
           bring?: string[]
           capacity?: number
+          category?: string
           city?: string
           cover_image?: string | null
           date: string
+          end_date?: string | null
           end_time?: string
           id?: string
+          invite_theme?: Json
           online_link?: string
           price?: number
           sample?: boolean
           start_time?: string
           status?: string
+          timezone?: string
           title: string
           tone?: string
           type?: string
+          updated_at?: string
+          venue_name?: string
+          visibility?: string
         }
         Update: {
           address?: string
@@ -124,19 +225,26 @@ export type Database = {
           blurb?: string
           bring?: string[]
           capacity?: number
+          category?: string
           city?: string
           cover_image?: string | null
           date?: string
+          end_date?: string | null
           end_time?: string
           id?: string
+          invite_theme?: Json
           online_link?: string
           price?: number
           sample?: boolean
           start_time?: string
           status?: string
+          timezone?: string
           title?: string
           tone?: string
           type?: string
+          updated_at?: string
+          venue_name?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -267,61 +375,103 @@ export type Database = {
           artist: string
           city: string
           collection: string
+          compare_at_price: number | null
           created_at: string
+          currency: string
+          depth_cm: number | null
+          description: string
+          edition_size: number | null
           format_id: string
+          height_cm: number | null
           id: string
           images: string[]
           medium: string
           medium_id: string | null
           price: number
+          quantity: number | null
           ratio: number
           sample: boolean
           shape: number
+          ships_from: string
           size: string
+          sku: string
+          sort_order: number
           status: string
           tags: string[]
           title: string
           tone: string
+          updated_at: string
+          weight_kg: number | null
+          width_cm: number | null
+          year: number | null
         }
         Insert: {
           artist: string
           city?: string
           collection?: string
+          compare_at_price?: number | null
           created_at?: string
+          currency?: string
+          depth_cm?: number | null
+          description?: string
+          edition_size?: number | null
           format_id?: string
+          height_cm?: number | null
           id?: string
           images?: string[]
           medium?: string
           medium_id?: string | null
           price?: number
+          quantity?: number | null
           ratio?: number
           sample?: boolean
           shape?: number
+          ships_from?: string
           size?: string
+          sku?: string
+          sort_order?: number
           status?: string
           tags?: string[]
           title: string
           tone?: string
+          updated_at?: string
+          weight_kg?: number | null
+          width_cm?: number | null
+          year?: number | null
         }
         Update: {
           artist?: string
           city?: string
           collection?: string
+          compare_at_price?: number | null
           created_at?: string
+          currency?: string
+          depth_cm?: number | null
+          description?: string
+          edition_size?: number | null
           format_id?: string
+          height_cm?: number | null
           id?: string
           images?: string[]
           medium?: string
           medium_id?: string | null
           price?: number
+          quantity?: number | null
           ratio?: number
           sample?: boolean
           shape?: number
+          ships_from?: string
           size?: string
+          sku?: string
+          sort_order?: number
           status?: string
           tags?: string[]
           title?: string
           tone?: string
+          updated_at?: string
+          weight_kg?: number | null
+          width_cm?: number | null
+          year?: number | null
         }
         Relationships: [
           {
@@ -626,6 +776,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      artist_plan: { Args: { artist_id: string }; Returns: string }
       check_in_ticket: { Args: { ticket_id: string }; Returns: undefined }
       complete_registration: { Args: { payload: Json }; Returns: undefined }
       event_spots: { Args: { event_id: string }; Returns: number }
@@ -637,6 +788,18 @@ export type Database = {
         Returns: boolean
       }
       my_artist_social_counts: { Args: never; Returns: Json }
+      my_event_stats: {
+        Args: { event_id: string }
+        Returns: {
+          cancelled: number
+          capacity: number
+          checked_in: number
+          reserved: number
+          unique_visitors: number
+          views: number
+          waitlist: number
+        }[]
+      }
       owns_ticket_event: { Args: { event_id: string }; Returns: boolean }
       public_piece_favorite_counts: {
         Args: never
@@ -644,6 +807,10 @@ export type Database = {
           favorite_count: number
           piece_id: string
         }[]
+      }
+      record_event_view: {
+        Args: { event_id: string; visitor: string }
+        Returns: undefined
       }
       reserve_ticket: {
         Args: { event_id: string }

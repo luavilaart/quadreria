@@ -71,6 +71,20 @@
       "when": 1795495765416,
       "tag": "0009_include_public_media_sample_favorites",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795564786393,
+      "tag": "0010_artist_studio_database",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795564920490,
+      "tag": "0011_room_about_visibility_null_safe",
+      "breakpoints": true
     }
   ]
 }

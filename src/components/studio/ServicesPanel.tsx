@@ -1,23 +1,26 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { QButton } from "@/components/q/QButton";
+import { uploadImage } from "@/components/q/AccountProvider";
 import { refreshStudio } from "@/lib/artist-studio";
 import type { StudioData } from "@/lib/studio";
-import { useFormat } from "@/i18n";
+import { useFormat, useT } from "@/i18n";
 import { useStudioCopy } from "@/i18n/studio";
 import { AreaField, Empty, Panel, SaveButton, SelectField, TextField, Toggle } from "./ui";
 
 type Service = StudioData["services"][number];
-type Draft = { id?: string; title: string; description: string; price_type: string; price: string; published: boolean };
-const blank: Draft = { title: "", description: "", price_type: "fixed", price: "", published: true };
+type Draft = { id?: string; title: string; description: string; price_type: string; price: string; published: boolean; image: string | null };
+const blank: Draft = { title: "", description: "", price_type: "fixed", price: "", published: true, image: null };
 
-/** Services: what people can hire the artist for. Fixed, hourly or a paid consult. */
+/** Services: what people can hire the artist for. Fixed, hourly or a paid consult, each with an optional small picture. */
 export function ServicesPanel({ data, owner }: { data: StudioData; owner: string }) {
   const c = useStudioCopy();
+  const t = useT();
   const f = useFormat();
+  const [uploading, setUploading] = useState(false);
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
@@ -31,13 +34,21 @@ export function ServicesPanel({ data, owner }: { data: StudioData; owner: string
     const price = Number(draft.price);
     if (!draft.title.trim() || !Number.isFinite(price) || price < 0) { toast.error(c.required); return; }
     setBusy(true);
-    const row = { artist: owner, title: draft.title.trim(), description: draft.description.trim(), price_type: draft.price_type, price, published: draft.published };
+    const row = { artist: owner, title: draft.title.trim(), description: draft.description.trim(), price_type: draft.price_type, price, published: draft.published, image: draft.image };
     const { error } = draft.id ? await supabase.from("services").update(row).eq("id", draft.id) : await supabase.from("services").insert(row);
     setBusy(false);
     if (error) { toast.error(c.error); return; }
     setDraft(null);
     await refreshStudio(qc);
     toast.success(c.saved);
+  }
+
+  async function pickImage(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    try { set({ image: await uploadImage("piece-images", owner, file, t.account.uploadError) }); }
+    catch (err) { toast.error(err instanceof Error ? err.message : c.error); }
+    finally { setUploading(false); }
   }
 
   async function remove(id: string) {
@@ -54,11 +65,12 @@ export function ServicesPanel({ data, owner }: { data: StudioData; owner: string
         <ul className="space-y-2">
           {data.services.map((s) => (
             <li key={s.id} className="flex items-center gap-3 rounded-2xl border border-line bg-wall px-4 py-3">
+              <div className="flex h-14 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-card">{s.image ? <img src={s.image} alt="" className="max-h-full max-w-full object-contain" /> : <ImagePlus aria-hidden className="size-5 text-stone/60" />}</div>
               <div className="min-w-0 flex-1">
                 <p className="font-display text-lg leading-tight">{s.title}</p>
                 <p className="text-sm text-stone">{label(s)}{s.published ? "" : ` · ${c.shop.statuses.hidden}`}</p>
               </div>
-              <QButton aria-label={`${c.edit}: ${s.title}`} onClick={() => setDraft({ id: s.id, title: s.title, description: s.description, price_type: s.price_type, price: String(s.price), published: s.published })} className="!h-10 !w-10 !p-0"><Pencil /></QButton>
+              <QButton aria-label={`${c.edit}: ${s.title}`} onClick={() => setDraft({ id: s.id, title: s.title, description: s.description, price_type: s.price_type, price: String(s.price), published: s.published, image: s.image })} className="!h-10 !w-10 !p-0"><Pencil /></QButton>
               <QButton aria-label={`${c.delete}: ${s.title}`} onClick={() => void remove(s.id)} className="!h-10 !w-10 !p-0 text-deep-tomato"><Trash2 /></QButton>
             </li>
           ))}
@@ -69,6 +81,20 @@ export function ServicesPanel({ data, owner }: { data: StudioData; owner: string
         <form onSubmit={save}>
           <Panel title={draft.id ? c.edit : c.services.add}>
             <TextField label={c.services.title} value={draft.title} onChange={(v) => set({ title: v })} required maxLength={100} />
+            <div>
+              <p className="text-sm font-medium">{c.services.image}</p>
+              <p className="mt-0.5 text-xs text-stone">{c.services.imageHint}</p>
+              <div className="mt-2 flex items-center gap-4">
+                <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-wall p-1.5">
+                  {draft.image ? <img src={draft.image} alt="" className="max-h-full max-w-full rounded-md object-contain" /> : <ImagePlus aria-hidden className="size-6 text-stone/60" />}
+                </div>
+                <label className={`btn btn-ghost cursor-pointer !px-4 !py-2 text-sm ${uploading ? "opacity-60" : ""}`}>
+                  {uploading ? c.saving : draft.image ? c.services.changeImage : c.services.addImage}
+                  <input type="file" accept="image/*" className="sr-only" disabled={uploading} onChange={(e) => void pickImage(e.target.files?.[0])} />
+                </label>
+                {draft.image && <QButton onClick={() => set({ image: null })} className="!px-3 !py-2 text-sm text-deep-tomato">{c.services.removeImage}</QButton>}
+              </div>
+            </div>
             <AreaField label={c.services.description} value={draft.description} onChange={(v) => set({ description: v })} rows={3} maxLength={600} />
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField label={c.services.priceType} value={draft.price_type} onChange={(v) => set({ price_type: v })}

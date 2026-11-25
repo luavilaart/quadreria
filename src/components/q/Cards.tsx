@@ -1,10 +1,11 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {MediaTile} from "./MediaTile";
 import {useTaxonomy} from "./TaxonomyProvider";
 import {label,isForSale,activeEntries} from "@/data/taxonomy";
 import type {Language} from "@/i18n/taxonomy";
 import { Art } from "./Art";
-import { type Event, type Piece, type Service, type Artist } from "@/lib/gallery";
+import { galleryQuery, type Event, type Piece, type Service, type Artist } from "@/lib/gallery";
 import { useFormat, useT } from "@/i18n";
 import { FavoriteButton } from './SocialActions';
 
@@ -42,13 +43,26 @@ export function RoomCard({ a, language }: { a: Artist; language?:Language }) {
 
 export function ServiceCard({ s }: { s: Service }) {
   const f = useFormat();
+  const { data } = useSuspenseQuery(galleryQuery);
   const a = { handle: s.artist, name: s.artistName };
+  // The service's own picture, or else a piece from the artist's room, kept small beside the text.
+  const first = data.artists.find((x) => x.handle === s.artist)?.firstPiece;
+  const image = "image" in s && typeof s.image === "string" && s.image ? s.image : undefined;
   return (
-    <Link to="/a/$handle" params={{ handle: a.handle }} hash="services" className="block rounded-2xl border border-line bg-card p-5">
-      <p className="label text-stone">{a.name}</p>
-      <h3 className="mt-2 text-xl">{s.title}</h3>
-      <p className="mt-1 text-sm text-stone">{s.note}</p>
-      <p className="mt-4 font-medium">{f.service(s.price)}</p>
+    <Link to="/a/$handle" params={{ handle: a.handle }} hash="services" className="flex gap-4 rounded-2xl border border-line bg-card p-4 transition-colors hover:border-ink/40">
+      <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1.5 sm:h-28 sm:w-24">
+        {image
+          ? <img src={image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" />
+          : first
+            ? <div className="w-full"><Art ratio={first.ratio} tone={first.tone} shape={first.shape} src={first.images[0]} /></div>
+            : <div className="w-full"><Art ratio={1} tone="butter" shape={2} /></div>}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="label text-stone">{a.name}</p>
+        <h3 className="mt-1 text-xl leading-tight">{s.title}</h3>
+        <p className="mt-1 line-clamp-2 text-sm text-stone">{s.note}</p>
+        <p className="mt-2 font-medium">{f.service(s.price)}</p>
+      </div>
     </Link>
   );
 }

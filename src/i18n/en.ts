@@ -9,8 +9,10 @@ export const en = {
   lang: { label: "Language", es: "Español", en: "English", short: { es: "ES", en: "EN" } },
   nav: { discover: "Discover", events: "Events", join: "Join", studio: "Studio", about: "About us", menu: "Menu" },
   cityPicker: {
-    hint: "Or type any city in the world.",
-    placeholder: "Your city",
+    hint: "Pick from the list or type any city in the world.",
+    placeholder: "Start typing your city",
+    show: "Show cities",
+    useTyped: (city: string) => `Use “${city}”`,
   },
   preview: {
     readySub: "This is how collectors will see it.",

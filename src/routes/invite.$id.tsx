@@ -3,6 +3,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarPlus, Clock, MapPin, Share2, Ticket } from "lucide-react";
+import { MapSection } from "@/components/q/MapSection";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/components/q/AccountProvider";
 import { QButton } from "@/components/q/QButton";
@@ -158,6 +159,7 @@ function Invite() {
         </ul>
 
         {e.blurb && <section><h2 className={cn("text-2xl", titleCls)}>{i.about}</h2><p className="mt-2 whitespace-pre-line text-lg leading-relaxed opacity-90">{e.blurb}</p></section>}
+        {e.city !== "Online" && <MapSection venue={e.venue_name} address={e.address} city={e.city} className="text-ink" />}
         {e.bring.length > 0 && <section><h2 className={cn("text-2xl", titleCls)}>{i.bring}</h2><ul className="mt-2 list-disc space-y-1 pl-5">{e.bring.map((b) => <li key={b}>{b}</li>)}</ul></section>}
 
         <div className="flex flex-wrap justify-center gap-2">

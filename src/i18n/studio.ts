@@ -31,7 +31,7 @@ const en = {
     entranceHint: "The first thing people see when they walk in.",
     aboutHint: "Your story, in your words.",
     name: "Display name", tagline: "One line about your work", city: "City", photo: "Profile photo", changePhoto: "Change photo",
-    wall: "Wall color", links: "Links", bio: "Bio", loves: "Things I love", lovesHint: "One per line",
+    wall: "Wall color", links: "Links", bio: "Bio", loves: "Things I love", lovesHint: "Type one thing and press Add. They show in your About as little tags.", lovesAdd: "Add", lovesPlaceholder: "Coffee, rainy days, old maps…", lovesRemove: (x: string) => `Remove ${x}`,
   },
   sections: {
     intro: "Turn sections on or off. Hidden sections stay saved, they just don't show in your room.",
@@ -54,7 +54,7 @@ const en = {
     statuses: { draft: "Draft", available: "Available", sold: "Sold", hidden: "Hidden" },
     statusHelp: { draft: "Only you can see it.", available: "In your room and shop.", sold: "Stays on your wall, marked sold.", hidden: "Saved, but not shown anywhere." },
     stock: (n: number) => `${n} in stock`, madeToOrder: "Made to order", limit: (used: number, max: number) => `${used} of ${max} pieces on Free`,
-    shipping: "Shipping", shippingHint: "Flat rates you charge per order. You ship your own work.",
+    shipping: "Shipping", shippingHint: "Choose where you ship and how much you charge per order. Buyers see this before they pay. You pack and send your own work.", shippingSoon: "More options, like carriers and calculated rates, are coming.",
     zones: { honduras: "Honduras", central_america: "Central America", us_canada: "US & Canada", world: "Rest of the world" },
     ships: "Ships here", free: "Free", rate: "Rate",
   },
@@ -76,6 +76,7 @@ const en = {
     intro: "What people can hire you for.", add: "Add a service", empty: "No services yet.",
     title: "Title", description: "Description", priceType: "How you charge", price: "Price",
     types: { fixed: "Fixed price", hourly: "Per hour", consult: "Paid consult" }, published: "Show in my room",
+    image: "Picture", imageHint: "A small picture shown beside the service, like a piece you made or a photo of your setup.", addImage: "Add a picture", changeImage: "Change", removeImage: "Remove",
   },
   events: {
     intro: "Classes, openings, markets and online sessions.", add: "Create an event", empty: "No events yet.",
@@ -150,7 +151,7 @@ const es: typeof en = {
     entranceHint: "Lo primero que ven al entrar.",
     aboutHint: "Tu historia, con tus palabras.",
     name: "Nombre visible", tagline: "Una frase sobre tu obra", city: "Ciudad", photo: "Foto de perfil", changePhoto: "Cambiar foto",
-    wall: "Color de pared", links: "Enlaces", bio: "Bio", loves: "Cosas que me encantan", lovesHint: "Una por línea",
+    wall: "Color de pared", links: "Enlaces", bio: "Bio", loves: "Cosas que me encantan", lovesHint: "Escribí una cosa y tocá Agregar. Aparecen en tu Sobre mí como etiquetas.", lovesAdd: "Agregar", lovesPlaceholder: "Café, días de lluvia, mapas viejos…", lovesRemove: (x: string) => `Quitar ${x}`,
   },
   sections: {
     intro: "Prendé o apagá secciones. Las ocultas quedan guardadas, solo no se muestran en tu sala.",
@@ -173,7 +174,7 @@ const es: typeof en = {
     statuses: { draft: "Borrador", available: "Disponible", sold: "Vendida", hidden: "Oculta" },
     statusHelp: { draft: "Solo vos la ves.", available: "En tu sala y tu tienda.", sold: "Sigue en tu muro, marcada como vendida.", hidden: "Guardada, pero no se muestra." },
     stock: (n: number) => `${n} disponibles`, madeToOrder: "Bajo pedido", limit: (used: number, max: number) => `${used} de ${max} piezas en Gratis`,
-    shipping: "Envíos", shippingHint: "Tarifas fijas por pedido. Vos enviás tu obra.",
+    shipping: "Envíos", shippingHint: "Elegí a dónde enviás y cuánto cobrás por pedido. Quien compra lo ve antes de pagar. Vos empacás y enviás tu obra.", shippingSoon: "Pronto habrá más opciones, como paqueterías y tarifas calculadas.",
     zones: { honduras: "Honduras", central_america: "Centroamérica", us_canada: "EE. UU. y Canadá", world: "Resto del mundo" },
     ships: "Envío aquí", free: "Gratis", rate: "Tarifa",
   },
@@ -195,6 +196,7 @@ const es: typeof en = {
     intro: "Lo que te pueden contratar.", add: "Agregar un servicio", empty: "Todavía no hay servicios.",
     title: "Título", description: "Descripción", priceType: "Cómo cobrás", price: "Precio",
     types: { fixed: "Precio fijo", hourly: "Por hora", consult: "Consulta pagada" }, published: "Mostrar en mi sala",
+    image: "Foto", imageHint: "Una foto pequeña al lado del servicio, como una pieza tuya o tu espacio de trabajo.", addImage: "Agregar una foto", changeImage: "Cambiar", removeImage: "Quitar",
   },
   events: {
     intro: "Clases, inauguraciones, mercados y sesiones en línea.", add: "Crear un evento", empty: "Todavía no hay eventos.",

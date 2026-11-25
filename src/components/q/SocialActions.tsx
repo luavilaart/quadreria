@@ -10,7 +10,7 @@ import { socialQuery } from '@/lib/social';
 import { supabase } from '@/integrations/supabase/client';
 import { useSocialCopy } from '@/i18n/social';
 
-function SocialAction({kind,id}:{kind:'favorite'|'follow';id:string}) {
+function SocialAction({kind,id,className}:{kind:'favorite'|'follow';id:string;className?:string|undefined}) {
  const {user,role,loading}=useAccount();const c=useSocialCopy();const qc=useQueryClient();const navigate=useNavigate();
  const next=useRouterState({select:s=>s.location.href});
  const [prompt,setPrompt]=useState(false);const [busy,setBusy]=useState(false);
@@ -30,11 +30,11 @@ function SocialAction({kind,id}:{kind:'favorite'|'follow';id:string}) {
   }catch{toast.error(c.error);}finally{setBusy(false);}
  }
  return <>
-  <QButton aria-label={label} title={label} aria-pressed={active} disabled={loading||busy|| (!!user&&!!role&&saved.isPending)} onClick={()=>void toggle()} className={kind==='favorite'?'!p-2 h-10 w-10 shrink-0 rounded-full bg-card text-ink border border-line':'btn-ghost mt-5'}>
+  <QButton aria-label={label} title={label} aria-pressed={active} disabled={loading||busy|| (!!user&&!!role&&saved.isPending)} onClick={()=>void toggle()} className={kind==='favorite'?'!p-2 h-10 w-10 shrink-0 rounded-full bg-card text-ink border border-line':(className??'btn-ghost mt-5')}>
    {kind==='favorite'?<Heart aria-hidden className={`h-5 w-5 ${active?'fill-tomato text-ink':''}`}/>:label}
   </QButton>
   <Dialog open={prompt} onOpenChange={setPrompt}><DialogContent className="max-w-sm rounded-2xl bg-card text-ink"><DialogHeader><DialogTitle className="font-display text-2xl">{c.prompt}</DialogTitle></DialogHeader><div className="flex gap-3"><Link to="/join" onClick={()=>sessionStorage.setItem('quadreria-next',next)} className="btn btn-primary flex-1">{c.join}</Link><Link to="/auth" search={{next}} className="btn btn-ghost flex-1">{c.login}</Link></div></DialogContent></Dialog>
  </>;
 }
 export const FavoriteButton=({piece}:{piece:string})=><SocialAction kind="favorite" id={piece}/>;
-export const FollowButton=({artist}:{artist:string})=><SocialAction kind="follow" id={artist}/>;
+export const FollowButton=({artist,className}:{artist:string;className?:string})=><SocialAction kind="follow" id={artist} className={className}/>;

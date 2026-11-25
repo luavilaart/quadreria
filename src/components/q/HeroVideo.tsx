@@ -5,9 +5,10 @@ import { useEffect, useRef } from "react";
  * Shown at its true 1536 × 424 shape at every width so the wordmark is never cropped.
  * - Phones get a 768px-wide file; wider screens get the full 1536px one.
  * - The still poster shows until the video plays, and stays for reduced motion.
+ * - Pass heading={false} on pages that have their own h1.
  * - Playback starts only after hydration, and pauses while the banner is off screen.
  */
-export function HeroVideo({ label }: { label: string }) {
+export function HeroVideo({ label, heading = true }: { label: string; heading?: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function HeroVideo({ label }: { label: string }) {
 
   return (
     <section className="bg-ink">
-      <h1 className="sr-only">{label}</h1>
+      {heading ? <h1 className="sr-only">{label}</h1> : null}
       <div className="relative mx-auto aspect-[1536/424] w-full max-w-[1920px] overflow-hidden">
         <video
           ref={ref}

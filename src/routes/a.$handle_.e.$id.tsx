@@ -6,6 +6,8 @@ import { Page, SampleBadge } from "@/components/q/Shell";
 import { Art } from "@/components/q/Art";
 import { galleryQuery, fmtDate, usd } from "@/lib/gallery";
 import { useFormat, useT } from "@/i18n";
+import { MapSection } from "@/components/q/MapSection";
+import { placeQuery } from "@/lib/maps";
 
 export const Route = createFileRoute("/a/$handle_/e/$id")({
   loader: async ({ params, context }) => {
@@ -47,10 +49,11 @@ function EventPage() {
         <p className="mt-4 text-lg">{e.blurb}</p>
         <dl className="mt-6 grid gap-3 sm:grid-cols-2">
           <Info k={t.event.when} v={`${f.date(e.date, { weekday: "long", month: "long", day: "numeric" })} · ${e.time}`} />
-          <Info k={t.event.where} v={e.city === "Online" ? t.event.onlineWhere : `${e.address}, ${e.city}`} />
+          <Info k={t.event.where} v={e.city === "Online" ? t.event.onlineWhere : placeQuery([e.venue_name, e.address, e.city])} />
           <Info k={t.event.price} v={f.price(e.price)} />
           <Info k={t.event.spotsLabel} v={full ? t.event.fullOf(e.capacity) : t.event.left(e.spots, e.capacity)} />
         </dl>
+        <MapSection venue={e.venue_name} address={e.address} city={e.city} className="mt-6" />
         <h2 className="mt-8 text-2xl">{t.event.bring}</h2>
         <ul className="mt-3 list-disc space-y-1 pl-5">{e.bring.map((b) => <li key={b}>{b}</li>)}</ul>
         <div className="mt-8 rounded-2xl border border-line bg-card p-5">

@@ -135,7 +135,7 @@ function ShippingZones({ owner }: { owner: string }) {
           </li>
         ))}
       </ul>
-      <div className="flex justify-end"><SaveButton busy={busy} onClick={() => void save()} /></div>
+      <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-stone">{c.shop.shippingSoon}</p><SaveButton busy={busy} onClick={() => void save()} /></div>
     </Panel>
   );
 }

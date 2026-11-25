@@ -119,8 +119,9 @@ function Room() {
         <Section id="services" title={t.room.services}>
           <div className="grid gap-3 sm:grid-cols-2">
             {data.services.filter(s => s.artist === handle).map((s) => (
-              <div key={s.id} className="flex items-center justify-between gap-4 rounded-2xl bg-card p-5 text-ink">
-                <div><h3 className="text-xl">{s.title}</h3><p className="text-sm text-stone">{s.note}</p></div>
+              <div key={s.id} className="flex items-center justify-between gap-4 rounded-2xl bg-card p-4 text-ink">
+                {s.image && <div className="flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1"><img src={s.image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" /></div>}
+                <div className="min-w-0 flex-1"><h3 className="text-xl">{s.title}</h3><p className="text-sm text-stone">{s.note}</p></div>
                 <button className="btn btn-primary shrink-0 !px-4 !py-2 text-sm">{s.price}</button>
               </div>
             ))}

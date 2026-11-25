@@ -16,3 +16,8 @@
 - [x] Add owner-managed room media, storage, settings-based limits, and Lu's sample link.
 - [x] Add structured platform links, short Collector quiz, and private newsletter consent.
 - [x] Verify rules, signed-in changes, playback, and 390px layouts; commit changes.
+## Next (from the November feedback)
+- [ ] Reviews: collectors review artists after an order (the Studio already shows Reviews as "coming soon").
+- [ ] Shipping: research the shipping methods we can offer (carriers, calculated rates, labels, tracking), like Shopify, and replace the flat rates per zone.
+- [ ] Founder section on About: add Luciana's photo (public/about/) and her own bio.
+- [ ] Optional: let artists paste their own Google Maps link for an event (today the map is built from the venue, address and city).

@@ -21,8 +21,10 @@ export const es: Copy = {
     menu: "Menú",
   },
   cityPicker: {
-    hint: "O escribí cualquier ciudad del mundo.",
-    placeholder: "Tu ciudad",
+    hint: "Elegí de la lista o escribí cualquier ciudad del mundo.",
+    placeholder: "Empezá a escribir tu ciudad",
+    show: "Ver ciudades",
+    useTyped: (city: string) => `Usar “${city}”`,
   },
   preview: {
     readySub: "Así la van a ver los coleccionistas.",

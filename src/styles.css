@@ -182,3 +182,13 @@
 @keyframes confetti-drift { from { translate: 0 -12vh; } to { translate: 0 112vh; } }
 .confetti-bit { animation: confetti-drift 9s linear infinite; opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .confetti-bit { animation: none; } }
+
+/* Sections rise in as they scroll into view. Pure CSS, so nothing is hidden if a browser lacks support. */
+@keyframes reveal-up { from { opacity: 0; translate: 0 28px; } to { opacity: 1; translate: 0 0; } }
+@supports (animation-timeline: view()) {
+  .reveal { animation: reveal-up linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+}
+/* Art on the home wall tilts a little and lifts when you point at it. */
+.wall-tile { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease; }
+.wall-tile:hover, .wall-tile:focus-visible { transform: translateY(-6px) rotate(var(--tilt, -1deg)); box-shadow: 0 18px 30px -18px oklch(0.215 0.012 70 / .45); }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } .wall-tile, .wall-tile:hover { transition: none; transform: none; } }

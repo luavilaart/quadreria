@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Camera } from "lucide-react";
+import { Camera, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import { uploadImage } from "@/components/q/AccountProvider";
@@ -17,7 +17,8 @@ import { useStudioCopy } from "@/i18n/studio";
 import { featureCopy } from "@/i18n/features";
 import { useTaxonomy } from "@/components/q/TaxonomyProvider";
 import { cn } from "@/lib/utils";
-import { AreaField, Field, Panel, SaveButton, TextField } from "./ui";
+import { AreaField, Field, Panel, SaveButton, TextField, inputClass } from "./ui";
+import { QButton } from "@/components/q/QButton";
 
 /** Entrance (name, photo, tagline, city, wall, links) and About (bio, things I love). Both always show. */
 export function RoomPanel({ data }: { data: StudioData }) {
@@ -33,7 +34,7 @@ export function RoomPanel({ data }: { data: StudioData }) {
   const [wall, setWall] = useState(asRoomColor(room?.room_color));
   const [links, setLinks] = useState<LinkDraft[]>(() => linkDrafts(asRoomLinks(room?.links)));
   const [bio, setBio] = useState(room?.bio ?? "");
-  const [loves, setLoves] = useState((room?.loves ?? []).join("\n"));
+  const [loves, setLoves] = useState<string[]>(room?.loves ?? []);
   const [busy, setBusy] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   if (!profile || !room) return null;
@@ -51,7 +52,7 @@ export function RoomPanel({ data }: { data: StudioData }) {
         supabase.from("profiles").update({ display_name: name.trim(), city: normalizeCity(city) }).eq("id", profile.id),
         supabase.from("rooms").update({
           tagline: tagline.trim(), bio: bio.trim(), room_color: wall,
-          loves: loves.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 12),
+          loves: loves.slice(0, 12),
           links: resolved.filter((l): l is NonNullable<typeof l> => l !== null) as unknown as Json,
         }).eq("id", room.id),
       ]);
@@ -89,7 +90,7 @@ export function RoomPanel({ data }: { data: StudioData }) {
         </div>
         <TextField label={c.room.name} value={name} onChange={setName} required maxLength={80} />
         <TextField label={c.room.tagline} value={tagline} onChange={setTagline} maxLength={140} />
-        <Field label={c.room.city}><div className="mt-2"><CityPicker value={city} onChange={setCity} /></div></Field>
+        <div><p className="text-sm font-medium">{c.room.city}</p><div className="mt-1.5"><CityPicker value={city} onChange={setCity} label={c.room.city} /></div></div>
         <fieldset>
           <legend className="text-sm font-medium">{c.room.wall}</legend>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -110,10 +111,44 @@ export function RoomPanel({ data }: { data: StudioData }) {
 
       <Panel title={c.room.about} hint={c.room.aboutHint} badge={always}>
         <AreaField label={c.room.bio} value={bio} onChange={setBio} rows={5} maxLength={1200} />
-        <AreaField label={c.room.loves} hint={c.room.lovesHint} value={loves} onChange={setLoves} rows={4} />
+        <LovesField value={loves} onChange={setLoves} />
       </Panel>
 
       <div className="sticky bottom-4 z-10 flex justify-end"><SaveButton busy={busy} /></div>
     </form>
+  );
+}
+
+/** "Things I love": type one, press Add or Enter, and it joins the list as a little tag. Up to 12. */
+function LovesField({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const c = useStudioCopy();
+  const [draft, setDraft] = useState("");
+  const add = () => {
+    const item = draft.replace(/\s+/g, " ").trim().slice(0, 40);
+    if (item && value.length < 12 && !value.some((v) => v.toLowerCase() === item.toLowerCase())) onChange([...value, item]);
+    setDraft("");
+  };
+  return (
+    <div>
+      <label htmlFor="loves-input" className="text-sm font-medium">{c.room.loves}</label>
+      <p className="mt-0.5 text-xs text-stone">{c.room.lovesHint}</p>
+      {value.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {value.map((x) => (
+            <li key={x} className="chip !py-1.5 !pl-4 !pr-1.5">
+              {x}
+              <button type="button" aria-label={c.room.lovesRemove(x)} onClick={() => onChange(value.filter((v) => v !== x))} className="flex size-6 items-center justify-center rounded-full hover:bg-wall"><X aria-hidden className="size-3.5" /></button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-3 flex gap-2">
+        <input id="loves-input" value={draft} maxLength={40} disabled={value.length >= 12} placeholder={c.room.lovesPlaceholder}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
+          className={cn(inputClass, "mt-0 min-w-0 flex-1")} />
+        <QButton onClick={add} disabled={!draft.trim() || value.length >= 12} className="btn-ghost !px-4 !py-2"><Plus aria-hidden className="size-4" />{c.room.lovesAdd}</QButton>
+      </div>
+    </div>
   );
 }

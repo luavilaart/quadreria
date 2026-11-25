@@ -22,6 +22,7 @@ import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AHandleRouteImport } from './routes/a.$handle'
 import { Route as AdminTaxonomyRouteImport } from './routes/admin.taxonomy'
+import { Route as InviteIdRouteImport } from './routes/invite.$id'
 import { Route as MediumsMediumRouteImport } from './routes/mediums.$medium'
 import { Route as EsMediosMediumRouteImport } from './routes/es.medios.$medium'
 import { Route as MediumsMediumSpecialtyRouteImport } from './routes/mediums.$medium_.$specialty'
@@ -93,6 +94,11 @@ const AdminTaxonomyRoute = AdminTaxonomyRouteImport.update({
   path: '/admin/taxonomy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteIdRoute = InviteIdRouteImport.update({
+  id: '/invite/$id',
+  path: '/invite/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediumsMediumRoute = MediumsMediumRouteImport.update({
   id: '/mediums/$medium',
   path: '/mediums/$medium',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invite/$id': typeof InviteIdRoute
   '/mediums/$medium': typeof MediumsMediumRoute
   '/es/medios/$medium': typeof EsMediosMediumRoute
   '/mediums/$medium/$specialty': typeof MediumsMediumSpecialtyRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invite/$id': typeof InviteIdRoute
   '/mediums/$medium': typeof MediumsMediumRoute
   '/es/medios/$medium': typeof EsMediosMediumRoute
   '/mediums/$medium/$specialty': typeof MediumsMediumSpecialtyRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/studio': typeof AuthenticatedStudioRoute
   '/a/$handle': typeof AHandleRoute
   '/admin/taxonomy': typeof AdminTaxonomyRoute
+  '/invite/$id': typeof InviteIdRoute
   '/mediums/$medium': typeof MediumsMediumRoute
   '/es/medios/$medium': typeof EsMediosMediumRoute
   '/mediums/$medium_/$specialty': typeof MediumsMediumSpecialtyRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
+    | '/invite/$id'
     | '/mediums/$medium'
     | '/es/medios/$medium'
     | '/mediums/$medium/$specialty'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
+    | '/invite/$id'
     | '/mediums/$medium'
     | '/es/medios/$medium'
     | '/mediums/$medium/$specialty'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio'
     | '/a/$handle'
     | '/admin/taxonomy'
+    | '/invite/$id'
     | '/mediums/$medium'
     | '/es/medios/$medium'
     | '/mediums/$medium_/$specialty'
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   AHandleRoute: typeof AHandleRoute
   AdminTaxonomyRoute: typeof AdminTaxonomyRoute
+  InviteIdRoute: typeof InviteIdRoute
   MediumsMediumRoute: typeof MediumsMediumRoute
   EsMediosMediumRoute: typeof EsMediosMediumRoute
   MediumsMediumSpecialtyRoute: typeof MediumsMediumSpecialtyRoute
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTaxonomyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$id': {
+      id: '/invite/$id'
+      path: '/invite/$id'
+      fullPath: '/invite/$id'
+      preLoaderRoute: typeof InviteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mediums/$medium': {
       id: '/mediums/$medium'
       path: '/mediums/$medium'
@@ -433,6 +453,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   AHandleRoute: AHandleRoute,
   AdminTaxonomyRoute: AdminTaxonomyRoute,
+  InviteIdRoute: InviteIdRoute,
   MediumsMediumRoute: MediumsMediumRoute,
   EsMediosMediumRoute: EsMediosMediumRoute,
   MediumsMediumSpecialtyRoute: MediumsMediumSpecialtyRoute,

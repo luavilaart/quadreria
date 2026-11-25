@@ -16,11 +16,11 @@ const roomColors: RoomColor[] = ["cream", "blush", "butter", "sage", "sky", "lil
 const asRoomColor = (v: string | null | undefined): RoomColor => (roomColors.includes(v as RoomColor) ? (v as RoomColor) : "cream");
 
 /**
- * Studio "Preview my room": a floating button that opens the artist's own room in a side panel.
+ * Studio "Preview my room": a floating button (or, with `inline`, a header button) that opens the artist's own room in a side panel.
  * Reads the owner-only studio query (drafts and unpublished rooms included), which the Studio's
  * editors refresh after each save, so the preview follows the edits.
  */
-export function StudioRoomPreview() {
+export function StudioRoomPreview({ inline = false }: { inline?: boolean } = {}) {
   const t = useT();
   const p = t.preview;
   const { state, lang } = useTaxonomy();
@@ -52,8 +52,8 @@ export function StudioRoomPreview() {
 
   return (
     <>
-      <QButton onClick={() => setOpen(true)} className="btn-primary fixed bottom-5 right-5 z-40">
-        <Eye aria-hidden className="!size-5" />
+      <QButton onClick={() => setOpen(true)} className={inline ? "btn-ghost !py-2 text-sm" : "btn-primary fixed bottom-5 right-5 z-40"}>
+        <Eye aria-hidden className={inline ? "size-4" : "!size-5"} />
         {p.studioButton}
       </QButton>
       <Sheet open={open} onOpenChange={setOpen}>

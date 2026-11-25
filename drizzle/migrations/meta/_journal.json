@@ -92,6 +92,13 @@
       "when": 1795575451513,
       "tag": "0012_restrict_media_settings_read_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795576396131,
+      "tag": "0013_add_service_image",
+      "breakpoints": true
     }
   ]
 }

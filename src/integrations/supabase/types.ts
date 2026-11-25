@@ -640,6 +640,7 @@ export type Database = {
           artist: string
           description: string
           id: string
+          image: string | null
           price: number
           price_type: string
           published: boolean
@@ -650,6 +651,7 @@ export type Database = {
           artist: string
           description?: string
           id?: string
+          image?: string | null
           price?: number
           price_type?: string
           published?: boolean
@@ -660,6 +662,7 @@ export type Database = {
           artist?: string
           description?: string
           id?: string
+          image?: string | null
           price?: number
           price_type?: string
           published?: boolean

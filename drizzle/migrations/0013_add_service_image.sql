@@ -1,0 +1,2 @@
+ALTER TABLE public.services ADD COLUMN image text;
+COMMENT ON COLUMN public.services.image IS 'Public URL to a small preview picture for the service; uploaded to the piece-images bucket under the artist folder. Optional.';

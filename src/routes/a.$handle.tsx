@@ -17,6 +17,8 @@ import { galleryQuery } from "@/lib/gallery";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createContext, useContext, type ReactNode } from "react";
 import { useFormat, useT } from "@/i18n";
+import { usePagesCopy } from "@/i18n/pages";
+import { Plus } from "lucide-react";
 import { FavoriteButton, FollowButton } from '@/components/q/SocialActions';
 
 export const Route = createFileRoute("/a/$handle")({
@@ -51,33 +53,52 @@ function Room() {
   const [salon, setSalon] = useState(true);
   const shop = all.filter((p) => isForSale(p) && (col === "" || p.collection === col));
 
+  const pc = usePagesCopy();
+  const [sent, setSent] = useState(false);
   if (!a) return null;
+  const links = asRoomLinks(a.links);
+  const specialties = state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).flatMap(t=>t&&t.status!=="hidden"?[label(t,lang)+(t.status==="pending"?` · ${c.pending}`:"")]:[]);
+  const sections = withMediaSection(a.section_order, a.visible_sections);
+  const canContact = sections.visible.includes("contact");
+  const studioPiece = work[0];
   return (
-    <RoomSections.Provider value={withMediaSection(a.section_order, a.visible_sections)}>
+    <RoomSections.Provider value={sections}>
     <div className={`room-${a.room} bg-room text-room-fg`}>
       <SiteHeader />
-      {/* Entrance */}
-      <section className="mx-auto grid max-w-6xl items-center gap-8 px-5 pb-16 pt-12 sm:grid-cols-[1fr_auto]">
-        <div>
-          {a.sample && <SampleBadge />}
-          <p className="label mt-6 opacity-70">@{a.handle} · {f.city(a.city)}</p>
-          <h1 className="mt-2 text-5xl leading-none sm:text-7xl">{a.name}</h1>
-          <p className="mt-4 max-w-md text-lg opacity-85">{a.tagline}</p>
-          <FollowButton artist={a.handle}/>
-          <p className="mt-3 text-sm">{state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).filter(t=>t?.status!=="hidden").map(t=>t?<span key={t.id} className="mr-3">{label(t,lang)}{t.status==="pending"?" · "+c.pending:""}</span>:null)}</p>
-          {asRoomLinks(a.links).length > 0 && (
-            <ul aria-label={t.room.links} className="mt-4 flex flex-wrap gap-2">
-              {asRoomLinks(a.links).map((l, i) => (
-                <li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer" className="chip text-ink hover:border-ink"><PlatformIcon platform={l.platform} />{l.platform === "custom" ? l.label : featureCopy[lang][l.platform]}</a></li>
-              ))}
-            </ul>
-          )}
-          <div className="mt-6 hidden gap-3 sm:flex">
-            <a href="#services" className="btn btn-primary">{t.room.hire}</a>
-            <a href="#shop" className="btn btn-ghost">{t.room.shop}</a>
+      {/* Entrance: who they are, then one row of actions. Hire and Shop live in the bottom bar on phones. */}
+      <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 sm:pb-20 sm:pt-14">
+        {a.sample && <SampleBadge />}
+        <div className="mt-6 grid items-center gap-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-14">
+          <div className="order-2 min-w-0 sm:order-1">
+            <p className="label opacity-70">@{a.handle} · {f.city(a.city)}</p>
+            <h1 className="mt-3 text-5xl leading-[0.95] sm:text-7xl">{a.name}</h1>
+            {a.tagline && <p className="mt-4 max-w-lg text-lg opacity-85 sm:text-xl">{a.tagline}</p>}
+            {specialties.length > 0 && <p className="mt-4 text-sm opacity-75">{specialties.join(" · ")}</p>}
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a href="#services" className="btn btn-primary hidden !h-11 !py-0 sm:inline-flex">{t.room.hire}</a>
+              <a href="#shop" className="btn btn-ghost hidden !h-11 !py-0 sm:inline-flex">{t.room.shop}</a>
+              <FollowButton artist={a.handle} className="btn-ghost !h-11 !px-5 !py-0 !text-[0.95rem]" />
+              {links.length > 0 && (
+                <ul aria-label={t.room.links} className="flex flex-wrap items-center gap-2 sm:ml-2 sm:border-l sm:border-current/20 sm:pl-4">
+                  {links.map((l, i) => {
+                    const name = l.platform === "custom" ? l.label : featureCopy[lang][l.platform];
+                    return (
+                      <li key={i}>
+                        <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={pc.room.linkTo(name)} title={name}
+                          className={`flex h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-current/30 transition-colors hover:bg-room-fg hover:text-room ${l.platform === "custom" ? "px-4 text-sm" : "w-11"}`}>
+                          <PlatformIcon platform={l.platform} />{l.platform === "custom" && <span className="max-w-[10rem] truncate">{name}</span>}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
+          <div className="order-1 w-32 rotate-[1.5deg] rounded-2xl bg-paper p-2.5 shadow-[0_24px_40px_-28px_rgba(31,27,22,0.55)] sm:order-2 sm:w-60 lg:w-72">
+            <Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={t.room.portrait(a.name)} className="rounded-xl" />
           </div>
         </div>
-        <div className="w-40 sm:w-56"><Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={t.room.portrait(a.name)} className="rounded-2xl" /></div>
       </section>
 
       <div className="flex flex-col rounded-t-[2rem] bg-room pb-28 sm:pb-0">
@@ -111,18 +132,24 @@ function Room() {
 
         <Section id="shop" title={t.room.shop}>
           <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5">
-            {collections.map((c) => <QButton key={c} onClick={() => setCol(c)} className={`chip text-ink ${col === c ? "chip-on" : ""}`}>{c||featureCopy[lang].all}</QButton>)}
+            {collections.map((c) => <QButton key={c} aria-pressed={col === c} onClick={() => setCol(c)} className={`chip ${col === c ? "chip-on" : "text-ink hover:border-ink"}`}>{c||featureCopy[lang].all}</QButton>)}
           </div>
-          <ShopGrid rows={shop} showArtist={false}/>
+          <ShopGrid rows={shop} showArtist={false} filters={false}/>
         </Section>
 
         <Section id="services" title={t.room.services}>
           <div className="grid gap-3 sm:grid-cols-2">
             {data.services.filter(s => s.artist === handle).map((s) => (
-              <div key={s.id} className="flex items-center justify-between gap-4 rounded-2xl bg-card p-4 text-ink">
-                {s.image && <div className="flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1"><img src={s.image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" /></div>}
-                <div className="min-w-0 flex-1"><h3 className="text-xl">{s.title}</h3><p className="text-sm text-stone">{s.note}</p></div>
-                <button className="btn btn-primary shrink-0 !px-4 !py-2 text-sm">{s.price}</button>
+              <div key={s.id} className="flex gap-4 rounded-2xl bg-card p-4 text-ink">
+                {s.image && <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1.5"><img src={s.image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" /></div>}
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <h3 className="text-xl leading-tight">{s.title}</h3>
+                  {s.note && <p className="mt-1 text-sm text-stone">{s.note}</p>}
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
+                    <span className="font-medium">{f.service(s.price)}</span>
+                    {canContact && <a href="#contact" className="link text-sm">{pc.room.ask}</a>}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -134,25 +161,25 @@ function Room() {
         </Section>
 
         <Section id="about" title={t.room.about}>
-          <div className="grid gap-6 sm:grid-cols-[2fr_3fr]">
-            <Art ratio={3 / 2} tone="butter" shape={1} title={t.room.studioPhoto} className="rounded-2xl" />
+          <div className={studioPiece ? "grid items-start gap-8 sm:grid-cols-[15rem_minmax(0,1fr)] lg:grid-cols-[18rem_minmax(0,1fr)]" : "max-w-2xl"}>
+            {studioPiece && <div className="max-w-[15rem] rounded-2xl bg-paper p-3 sm:max-w-none"><Art ratio={studioPiece.ratio} tone={studioPiece.tone} shape={studioPiece.shape} src={studioPiece.images[0]} title={studioPiece.title} className="rounded-xl" /></div>}
             <div>
               <p className="text-lg leading-relaxed">{a.bio}</p>
               <p className="label mt-6 opacity-70">{t.room.love}</p>
-              <div className="mt-2 flex flex-wrap gap-2">{a.loves.map((l) => <span key={l} className="chip text-ink">{l}</span>)}</div>
+              <div className="mt-2 flex flex-wrap gap-2">{a.loves.map((l) => <span key={l} className="chip !py-1.5 text-ink">{l}</span>)}</div>
             </div>
           </div>
         </Section>
 
         <Section id="links" title={t.room.links}>
-          <div className="mx-auto max-w-md space-y-3">{asRoomLinks(a.links).map((l,i) => <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="btn btn-ghost w-full"><PlatformIcon platform={l.platform}/>{l.platform==='custom'?l.label:featureCopy[lang][l.platform]}</a>)}</div>
+          <div className="mx-auto max-w-md space-y-3">{links.map((l,i) => <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="btn btn-ghost w-full"><PlatformIcon platform={l.platform}/>{l.platform==='custom'?l.label:featureCopy[lang][l.platform]}</a>)}</div>
         </Section>
 
         <Section id="faq" title={t.room.faq}>
           <div className="space-y-2">
             {a.faq.map((f) => (
               <details key={f.q} className="group rounded-2xl bg-card p-5 text-ink">
-                <summary className="flex cursor-pointer list-none justify-between font-medium">{f.q}<span className="transition-transform group-open:rotate-45">+</span></summary>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">{f.q}<Plus aria-hidden className="size-5 shrink-0 text-deep-tomato transition-transform duration-300 group-open:rotate-45" /></summary>
                 <p className="mt-3 text-stone">{f.a}</p>
               </details>
             ))}
@@ -160,11 +187,12 @@ function Room() {
         </Section>
 
         <Section id="contact" title={t.room.contact}>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-3 rounded-2xl bg-card p-5 text-ink">
+          <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} className="mx-auto max-w-2xl space-y-3 rounded-2xl bg-card p-5 text-ink sm:p-6">
             <input placeholder={t.room.yourName} className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
             <input placeholder={t.room.email} type="email" className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
             <textarea placeholder={t.room.message(a.name.split(" ")[0] ?? a.name)} rows={4} className="w-full rounded-xl border border-line bg-wall px-4 py-3" />
             <button className="btn btn-primary w-full">{t.room.send}</button>
+            {sent && <p role="status" className="rounded-xl bg-wall p-4 text-sm text-stone">{pc.room.contactSoon(a.name.split(" ")[0] ?? a.name)}</p>}
           </form>
         </Section>
       </div>

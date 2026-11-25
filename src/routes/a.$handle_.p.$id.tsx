@@ -10,7 +10,9 @@ import { Art } from "@/components/q/Art";
 import { PieceCard } from "@/components/q/Cards";
 import { galleryQuery, usd } from "@/lib/gallery";
 import { useFormat, useT } from "@/i18n";
-import { FavoriteButton } from '@/components/q/SocialActions';
+import { FavoriteButton, FollowButton } from '@/components/q/SocialActions';
+import { usePagesCopy } from '@/i18n/pages';
+import { ArrowRight } from 'lucide-react';
 
 export const Route = createFileRoute("/a/$handle_/p/$id")({
   loader: async ({ params, context }) => {
@@ -37,6 +39,8 @@ function PiecePage() {
   useSuspenseQuery(galleryQuery);
   const { p, a } = Route.useLoaderData();
   const { data } = useSuspenseQuery(galleryQuery);
+  const pc = usePagesCopy().piece;
+  const specialties = state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).flatMap(t=>t&&t.status==='active'?[label(t,lang)]:[]).slice(0,3);
   return (
     <Page>
       <div className="mx-auto grid max-w-6xl gap-10 px-5 pt-8 lg:grid-cols-[3fr_2fr]">
@@ -59,6 +63,23 @@ function PiecePage() {
           {isForSale(p)&&<QButton disabled className="btn-primary mt-6 w-full">{t.piece.add} · {t.account.coming}</QButton>}
         </div>
       </div>
+      <section aria-labelledby="about-artist" className={`room-${a.room} mx-auto mt-16 max-w-6xl px-5`}>
+        <div className="grid items-center gap-6 rounded-3xl bg-room p-6 text-room-fg sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10 sm:p-10">
+          <Link to="/a/$handle" params={{ handle: a.handle }} className="block w-28 rotate-[-1.5deg] rounded-2xl bg-paper p-2 shadow-[0_20px_36px_-26px_rgba(31,27,22,0.6)] transition-transform hover:rotate-0 sm:w-40" tabIndex={-1} aria-hidden>
+            <Art src={a.photo ?? undefined} ratio={4 / 5} tone="cream" shape={2} title={t.room.portrait(a.name)} className="rounded-xl" />
+          </Link>
+          <div className="min-w-0">
+            <p id="about-artist" className="label opacity-70">{pc.aboutArtist}</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl">{a.name}</h2>
+            <p className="mt-1 text-sm opacity-75">{[f.city(a.city), ...specialties].filter(Boolean).join(" · ")}</p>
+            {(a.bio || a.tagline) && <p className="mt-4 line-clamp-4 max-w-2xl text-lg leading-relaxed opacity-90">{a.bio || a.tagline}</p>}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link to="/a/$handle" params={{ handle: a.handle }} className="btn btn-primary group !h-11 !py-0">{pc.visitRoom(a.name.split(" ")[0] ?? a.name)}<ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+              <FollowButton artist={a.handle} className="btn-ghost !h-11 !px-5 !py-0 !text-[0.95rem]" />
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="mx-auto mt-16 max-w-6xl px-5">
         <h2 className="mb-5 text-2xl">{t.piece.more}</h2>
         <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-4">{data.pieces.filter(p => p.artist === a.handle).filter((x) => x.id !== p.id).map((x) => <PieceCard key={x.id} p={x} showArtist={false} />)}</div>

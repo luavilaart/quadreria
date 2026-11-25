@@ -53,12 +53,12 @@ function Home() {
       </section>
 
       <section className="reveal mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle kicker={t.home.featuredKicker} title={t.home.featured} />
+        <SectionTitle kicker={t.home.featuredKicker} title={t.home.featured} action={<Link to="/discover" search={{ tab: "artists" }} className="link text-sm">{pc.home.allArtists}</Link>} />
         <div className="grid gap-4 sm:grid-cols-3">{artists.map((a) => <RoomCard key={a.handle} a={a} />)}</div>
       </section>
 
       <section className="reveal mx-auto mt-16 max-w-6xl px-5">
-        <SectionTitle kicker={t.home.hireSub} title={t.home.hire} />
+        <SectionTitle kicker={t.home.hireSub} title={t.home.hire} action={<Link to="/discover" search={{ tab: "services" }} className="link text-sm">{pc.home.allServices}</Link>} />
         <div className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-2">
           {services.map((s) => <div key={s.id} className="w-80 shrink-0 snap-start"><ServiceCard s={s} /></div>)}
         </div>

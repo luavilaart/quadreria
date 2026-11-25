@@ -9,6 +9,8 @@ type Faq = [question: string, answer: string][];
 const en = {
   join: { label: "Your next step", studio: "Go to your studio", findArt: "Find art" },
   home: {
+    allArtists: "All artists",
+    allServices: "All services",
     galleryKicker: "From the rooms",
     galleryTitle: "A wall of work",
     galleryNote: "A piece from every room. Tap one to step inside.",
@@ -67,6 +69,15 @@ const en = {
       ["Can I join from outside Honduras?", "Yes. Artists and collectors can join from any city in the world."],
     ] as Faq,
   },
+  piece: {
+    aboutArtist: "About the artist",
+    visitRoom: (name: string) => `Visit ${name}'s room`,
+  },
+  room: {
+    ask: "Ask about this",
+    contactSoon: (name: string) => `Messages open soon. Until then, reach ${name} through the links in this room.`,
+    linkTo: (site: string) => `${site} (opens in a new tab)`,
+  },
   links: {
     goesTo: "Goes to",
     check: "Check",
@@ -78,6 +89,8 @@ const en = {
 const es: typeof en = {
   join: { label: "Tu siguiente paso", studio: "Ir a tu estudio", findArt: "Buscar arte" },
   home: {
+    allArtists: "Todos los artistas",
+    allServices: "Todos los servicios",
     galleryKicker: "Desde las salas",
     galleryTitle: "Un muro de obra",
     galleryNote: "Una pieza de cada sala. Tocá una para entrar.",
@@ -135,6 +148,15 @@ const es: typeof en = {
       ["¿Se revisa cada pieza?", "Nuestro equipo revisa las primeras tres piezas de cada artista antes de publicarlas. Después, cada artista publica por su cuenta."],
       ["¿Me puedo unir desde fuera de Honduras?", "Sí. Artistas y coleccionistas se pueden unir desde cualquier ciudad del mundo."],
     ],
+  },
+  piece: {
+    aboutArtist: "Sobre el artista",
+    visitRoom: (name: string) => `Visitá la sala de ${name}`,
+  },
+  room: {
+    ask: "Consultar",
+    contactSoon: (name: string) => `Los mensajes abren pronto. Mientras tanto, escribile a ${name} por los enlaces de esta sala.`,
+    linkTo: (site: string) => `${site} (se abre en otra pestaña)`,
   },
   links: {
     goesTo: "Lleva a",

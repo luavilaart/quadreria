@@ -2,14 +2,14 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { galleryQuery } from '@/lib/gallery';
 import { pageHead } from '@/lib/head';
 import { supabase } from '@/integrations/supabase/client';
-import { TaxonomyStudio } from '@/components/q/TaxonomyStudio';
 import { CollectorStudio } from '@/components/q/CollectorStudio';
-import { StudioRoomPreview } from '@/components/q/StudioRoomPreview';
+import { ArtistStudio, studioTabs, type StudioTab } from '@/components/studio/ArtistStudio';
 import { socialCopy } from '@/i18n/social';
 import { langOf } from '@/i18n';
 import { studioDestination } from '@/lib/social';
 
 export const Route=createFileRoute('/_authenticated/studio')({
+ validateSearch:(s:Record<string,unknown>):{tab?:StudioTab}=>studioTabs.includes(s['tab'] as StudioTab)&&s['tab']!=='overview'?{tab:s['tab'] as StudioTab}:{},
  beforeLoad:async()=>{
   const {data:u,error}=await supabase.auth.getUser();
   if(error||!u.user)throw redirect({to:'/auth',search:{next:'/studio'}});
@@ -23,4 +23,4 @@ export const Route=createFileRoute('/_authenticated/studio')({
  head:({match})=>{const c=socialCopy[langOf(match.context)];return pageHead(c.title,c.description);},
  component:Studio,
 });
-function Studio(){const {studioRole}=Route.useRouteContext();return studioRole==='artist'?<><TaxonomyStudio/><StudioRoomPreview/></>:<CollectorStudio/>;}
+function Studio(){const {studioRole}=Route.useRouteContext();const {tab}=Route.useSearch();return studioRole==='artist'?<ArtistStudio tab={tab??'overview'}/>:<CollectorStudio/>;}

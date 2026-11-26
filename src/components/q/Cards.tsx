@@ -2,7 +2,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {MediaTile} from "./MediaTile";
 import {useTaxonomy} from "./TaxonomyProvider";
-import {label,isForSale,activeEntries} from "@/data/taxonomy";
+import {label,artistSpecialtyLabel,isForSale,activeEntries} from "@/data/taxonomy";
+import {ServiceTypeLink} from './ServiceTypeLink';
+import {sampleServiceCopy} from '@/i18n/taxonomy';
 import type {Language} from "@/i18n/taxonomy";
 import { Art } from "./Art";
 import { galleryQuery, type Event, type Piece, type Service, type Artist } from "@/lib/gallery";
@@ -29,7 +31,7 @@ export function RoomCard({ a, language }: { a: Artist; language?:Language }) {
   const {state,lang:globalLang}=useTaxonomy();const lang=language??globalLang;
   const main=state.artist_mediums.find(m=>m.artist_id===a.id&&m.is_main);
   const names=activeEntries(state.taxonomy,"medium").filter(t=>t.id===main?.medium_id).map(t=>label(t,lang));
-  const specialties=activeEntries(state.taxonomy,"specialty").filter(t=>state.artist_specialties.some(s=>s.artist_id===a.id&&s.specialty_id===t.id)).slice(0,2).map(t=>label(t,lang));
+  const specialties=activeEntries(state.taxonomy,"specialty").filter(t=>state.artist_specialties.some(s=>s.artist_id===a.id&&s.specialty_id===t.id)).sort((a,b)=>Number(b.slug==='mural')-Number(a.slug==='mural')).slice(0,2).map(t=>artistSpecialtyLabel(t,lang));
   const first = a.firstPiece;
   return (
     <Link to="/a/$handle" params={{ handle: a.handle }} className={`room-${a.room} block rounded-2xl bg-room p-5 text-room-fg`}>
@@ -43,13 +45,16 @@ export function RoomCard({ a, language }: { a: Artist; language?:Language }) {
 
 export function ServiceCard({ s }: { s: Service }) {
   const f = useFormat();
+  const { lang, c } = useTaxonomy();
+  const translated = s.sample ? s.id === 'sample-video-editing' ? sampleServiceCopy[lang].video : s.id === 'sample-web-design' ? sampleServiceCopy[lang].web : null : null;
   const { data } = useSuspenseQuery(galleryQuery);
   const a = { handle: s.artist, name: s.artistName };
   // The service's own picture, or else a piece from the artist's room, kept small beside the text.
   const first = data.artists.find((x) => x.handle === s.artist)?.firstPiece;
   const image = "image" in s && typeof s.image === "string" && s.image ? s.image : undefined;
   return (
-    <Link to="/a/$handle" params={{ handle: a.handle }} hash="services" className="flex gap-4 rounded-2xl border border-line bg-card p-4 transition-colors hover:border-ink/40">
+    <div className="rounded-2xl border border-line bg-card p-4 transition-colors hover:border-ink/40">
+    <Link to="/a/$handle" params={{ handle: a.handle }} hash="services" className="flex gap-4">
       <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1.5 sm:h-28 sm:w-24">
         {image
           ? <img src={image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" />
@@ -59,11 +64,13 @@ export function ServiceCard({ s }: { s: Service }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="label text-stone">{a.name}</p>
-        <h3 className="mt-1 text-xl leading-tight">{s.title}</h3>
-        <p className="mt-1 line-clamp-2 text-sm text-stone">{s.note}</p>
+        <h3 className="mt-1 text-xl leading-tight">{translated?.title ?? s.title}</h3>
+        <p className="mt-1 line-clamp-2 text-sm text-stone">{translated?.note ?? s.note}</p>
         <p className="mt-2 font-medium">{f.service(s.price)}</p>
       </div>
     </Link>
+    <div className="mt-3 flex flex-wrap items-center gap-2"><ServiceTypeLink typeId={s.service_type_id}/>{s.sample && <span className="text-xs text-stone">{c.sample}</span>}</div>
+    </div>
   );
 }
 

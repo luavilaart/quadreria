@@ -45,4 +45,5 @@ use the editor.
 - Shared shop controls validate URL state with optional-input Zod schemas; sorting uses public aggregate counts, private interests/follows, and a nullable artist-rating adapter for future reviews.
 - Registration records newsletter consent transactionally using server time and role-derived source; client drafts never grant roles.
 - Platform links normalize through one shared helper for quiz and Studio; room media loads players only after an explicit play action and coordinates one active player.
+- Service types are taxonomy entries linked through parent_id to a medium or specialty; services store service_type_id so filters use the service's category rather than the artist's main medium. The existing Taxonomy screen remains a session-only review preview.
 <!-- AGENT-MEMORY:END -->

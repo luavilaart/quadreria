@@ -645,6 +645,7 @@ export type Database = {
           price_type: string
           published: boolean
           sample: boolean
+          service_type_id: string | null
           title: string
         }
         Insert: {
@@ -656,6 +657,7 @@ export type Database = {
           price_type?: string
           published?: boolean
           sample?: boolean
+          service_type_id?: string | null
           title: string
         }
         Update: {
@@ -667,6 +669,7 @@ export type Database = {
           price_type?: string
           published?: boolean
           sample?: boolean
+          service_type_id?: string | null
           title?: string
         }
         Relationships: [
@@ -675,6 +678,13 @@ export type Database = {
             columns: ["artist"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_service_type_id_fkey"
+            columns: ["service_type_id"]
+            isOneToOne: false
+            referencedRelation: "taxonomy"
             referencedColumns: ["id"]
           },
         ]

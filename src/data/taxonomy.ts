@@ -1,5 +1,5 @@
-import { mediumCatalog, formatCatalog, styleCatalog, taxonomyIntro, type Language } from '@/i18n/taxonomy';
-export type TaxonomyKind = 'medium' | 'specialty' | 'format' | 'style';
+import { mediumCatalog, formatCatalog, styleCatalog, serviceCatalog, artistSpecialtyCopy, taxonomyIntro, type Language } from '@/i18n/taxonomy';
+export type TaxonomyKind = 'medium' | 'specialty' | 'format' | 'style' | 'service';
 export type TaxonomyEntry = { id:string; kind:TaxonomyKind; parent_id:string|null; slug:string; slug_es:string; label_en:string; label_es:string; intro_en:string; intro_es:string; sort_order:number; status:'active'|'pending'|'hidden'; suggested_by:string|null; merged_into:string|null };
 export type ArtistMedium = {artist_id:string;medium_id:string;is_main:boolean};
 export type ArtistSpecialty = {artist_id:string;specialty_id:string};
@@ -15,11 +15,14 @@ export type TaxonomySettings = Record<Plan,{max_mediums:number;max_specialties:n
 export const defaultSettings:TaxonomySettings = {free:{max_mediums:3,max_specialties:8,max_pieces:12,video_upload_max_s:60,audio_upload_max_s:300,video_upload_max_mb:100,audio_upload_max_mb:20},pro:{max_mediums:6,max_specialties:20,max_pieces:null,video_upload_max_s:600,audio_upload_max_s:3600,video_upload_max_mb:500,audio_upload_max_mb:100}};
 function entry(kind:TaxonomyKind,row:readonly string[],order:number,parent:string|null=null):TaxonomyEntry {
  const [slug='',slug_es='',label_en='',label_es='']=row;
- return {id:parent?`${parent}:${slug}`:`${kind}:${slug}`,kind,parent_id:parent,slug,slug_es,label_en,label_es,...taxonomyIntro(label_en,label_es),sort_order:order,status:'active',suggested_by:null,merged_into:null};
+ return {id:parent&&kind==='specialty'?`${parent}:${slug}`:`${kind}:${slug}`,kind,parent_id:parent,slug,slug_es,label_en,label_es,...taxonomyIntro(label_en,label_es),sort_order:order,status:'active',suggested_by:null,merged_into:null};
 }
-export const taxonomy:TaxonomyEntry[] = mediumCatalog.flatMap(([slug,es,enLabel,esLabel,children],i)=>{const m=entry('medium',[slug,es,enLabel,esLabel],i);return [m,...children.map((r,j)=>entry('specialty',r,j,m.id))];}).concat(formatCatalog.map((r,i)=>entry('format',r,i)),styleCatalog.map((r,i)=>entry('style',r,i)));
+export const taxonomy:TaxonomyEntry[] = mediumCatalog.flatMap(([slug,es,enLabel,esLabel,children],i)=>{const m=entry('medium',[slug,es,enLabel,esLabel],i);return [m,...children.map((r,j)=>entry('specialty',r,j,m.id))];}).concat(formatCatalog.map((r,i)=>entry('format',r,i)),styleCatalog.map((r,i)=>entry('style',r,i)),serviceCatalog.map((r,i)=>entry('service',r,i,r[4])));
 export const label = (e:TaxonomyEntry,lang:Language='en')=>lang==='es'?e.label_es:e.label_en;
-export const activeEntries=(rows:TaxonomyEntry[],kind:TaxonomyKind,parent?:string)=>rows.filter(e=>e.kind===kind&&e.status==='active'&&(!parent||e.parent_id===parent)&&(!e.parent_id||rows.some(p=>p.id===e.parent_id&&p.status==='active'))).sort((a,b)=>a.sort_order-b.sort_order);
+export const artistSpecialtyLabel = (e:TaxonomyEntry,lang:Language='en')=>e.id==='medium:painting:mural'?artistSpecialtyCopy[lang].mural:label(e,lang);
+export function taxonomyAncestors(rows:TaxonomyEntry[],id:string):TaxonomyEntry[] { const result:TaxonomyEntry[]=[];let current=rows.find(t=>t.id===id);while(current&&!result.some(t=>t.id===current?.id)){result.push(current);current=rows.find(t=>t.id===current?.parent_id);}return result; }
+export const activeEntries=(rows:TaxonomyEntry[],kind:TaxonomyKind,parent?:string)=>rows.filter(e=>{const chain=taxonomyAncestors(rows,e.id);return e.kind===kind&&(!parent||e.parent_id===parent)&&chain.at(-1)?.parent_id===null&&chain.every(t=>t.status==='active');}).sort((a,b)=>a.sort_order-b.sort_order);
+export function serviceTaxonomy(rows:TaxonomyEntry[],id:string|null|undefined){const chain=id?taxonomyAncestors(rows,id):[];return {medium_id:chain.find(t=>t.kind==='medium')?.id??'',specialty_ids:chain.filter(t=>t.kind==='specialty').map(t=>t.id)};}
 export function validateSelection(mediums:ArtistMedium[],specialties:ArtistSpecialty[],rows:TaxonomyEntry[],plan:Plan,settings:TaxonomySettings):string|null {
  const limits=settings[plan];if(new Set(specialties.map(s=>s.specialty_id)).size!==specialties.length)return 'parentError';if(mediums.length>limits.max_mediums||specialties.length>limits.max_specialties)return 'limitError';
  if(mediums.some(m=>!rows.some(t=>t.kind==='medium'&&t.id===m.medium_id&&t.status==='active')))return 'parentError';

@@ -10,7 +10,9 @@ import { useState } from "react";
 import { SiteHeader, SiteFooter, SampleBadge } from "@/components/q/Shell";
 import {MediaTile} from "@/components/q/MediaTile";
 import {useTaxonomy} from "@/components/q/TaxonomyProvider";
-import {isForSale,label} from "@/data/taxonomy";
+import {isForSale,label,artistSpecialtyLabel,activeEntries} from "@/data/taxonomy";
+import {ServiceTypeLink} from '@/components/q/ServiceTypeLink';
+import {sampleServiceCopy} from '@/i18n/taxonomy';
 import { Art } from "@/components/q/Art";
 import { PieceCard, EventCard } from "@/components/q/Cards";
 import { galleryQuery } from "@/lib/gallery";
@@ -57,7 +59,7 @@ function Room() {
   const [sent, setSent] = useState(false);
   if (!a) return null;
   const links = asRoomLinks(a.links);
-  const specialties = state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).flatMap(t=>t&&t.status!=="hidden"?[label(t,lang)+(t.status==="pending"?` · ${c.pending}`:"")]:[]);
+  const specialties = state.artist_specialties.filter(s=>s.artist_id===a.id).map(s=>state.taxonomy.find(t=>t.id===s.specialty_id)).flatMap(t=>t&&t.status!=="hidden"?[artistSpecialtyLabel(t,lang)+(t.status==="pending"?` · ${c.pending}`:"")]:[]);
   const sections = withMediaSection(a.section_order, a.visible_sections);
   const canContact = sections.visible.includes("contact");
   const studioPiece = work[0];
@@ -139,12 +141,13 @@ function Room() {
 
         <Section id="services" title={t.room.services}>
           <div className="grid gap-3 sm:grid-cols-2">
-            {data.services.filter(s => s.artist === handle).map((s) => (
+            {data.services.filter(s => s.artist === handle && (!s.service_type_id || activeEntries(state.taxonomy,'service').some(t=>t.id===s.service_type_id))).map((s) => (
               <div key={s.id} className="flex gap-4 rounded-2xl bg-card p-4 text-ink">
                 {s.image && <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wall p-1.5"><img src={s.image} alt="" loading="lazy" className="max-h-full max-w-full rounded-md object-contain" /></div>}
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <h3 className="text-xl leading-tight">{s.title}</h3>
-                  {s.note && <p className="mt-1 text-sm text-stone">{s.note}</p>}
+                  <h3 className="text-xl leading-tight">{s.sample && s.id==='sample-video-editing'?sampleServiceCopy[lang].video.title:s.sample && s.id==='sample-web-design'?sampleServiceCopy[lang].web.title:s.title}</h3>
+                  <ServiceTypeLink typeId={s.service_type_id}/>
+                  {s.note && <p className="mt-1 text-sm text-stone">{s.sample && s.id==='sample-video-editing'?sampleServiceCopy[lang].video.note:s.sample && s.id==='sample-web-design'?sampleServiceCopy[lang].web.note:s.note}</p>}
                   <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
                     <span className="font-medium">{f.service(s.price)}</span>
                     {canContact && <a href="#contact" className="link text-sm">{pc.room.ask}</a>}

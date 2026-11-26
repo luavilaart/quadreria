@@ -16,6 +16,8 @@
 - [x] Add owner-managed room media, storage, settings-based limits, and Lu's sample link.
 - [x] Add structured platform links, short Collector quiz, and private newsletter consent.
 - [x] Verify rules, signed-in changes, playback, and 390px layouts; commit changes.
+- [x] Add bilingual specialties, muralist labels, and linked service types with sample services.
+- [x] Connect service types to Discover, Studio, and the existing Taxonomy editor; verify tests and 390px layouts.
 ## Next (from the November feedback)
 - [ ] Reviews: collectors review artists after an order (the Studio already shows Reviews as "coming soon").
 - [ ] Shipping: research the shipping methods we can offer (carriers, calculated rates, labels, tracking), like Shopify, and replace the flat rates per zone.

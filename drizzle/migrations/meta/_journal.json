@@ -99,6 +99,13 @@
       "when": 1795576396131,
       "tag": "0013_add_service_image",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1795659552903,
+      "tag": "0014_linked_service_taxonomy",
+      "breakpoints": true
     }
   ]
 }

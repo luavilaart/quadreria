@@ -1,7 +1,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { galleryQuery, cities } from "@/lib/gallery";
-import { activeEntries, label, type TaxonomyEntry } from "@/data/taxonomy";
+import { activeEntries, label, serviceTaxonomy, type TaxonomyEntry } from "@/data/taxonomy";
 import {
   browseTabs,
   findMedium,
@@ -12,7 +12,7 @@ import {
   type BrowseSearch,
   type SortKey,
 } from "@/data/discovery";
-import { taxonomyCopy, type Language } from "@/i18n/taxonomy";
+import { taxonomyCopy, serviceTypeCopy, type Language } from "@/i18n/taxonomy";
 import { formatters } from "@/i18n";
 import { socialQuery } from "@/lib/social";
 import { useTaxonomy } from "./TaxonomyProvider";
@@ -42,6 +42,8 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
   const sort: SortKey = search.sort ?? "recommended";
   const medium = fixed ? fixed.medium : findMedium(rows, search.medium);
   const specialty = fixed ? fixed.specialty : findSpecialty(rows, medium?.id, search.specialty);
+  const serviceTypes = activeEntries(rows, 'service').filter(t => { const refs = serviceTaxonomy(rows, t.id);return (!medium || refs.medium_id === medium.id) && (!specialty || refs.specialty_ids.includes(specialty.id)); });
+  const serviceType = serviceTypes.find(t => t.slug === search.service || t.id === search.service);
   // Artists can live in any city, so the filter lists the cities that appear, launch cities first.
   const cityOptions = [...new Set([...cities, ...data.artists.map((a) => a.city), ...data.pieces.map((p) => p.city), ...data.events.map((e) => e.city)].filter(Boolean))]
     .sort((x, y) => (cities.includes(x) ? cities.indexOf(x) : 99) - (cities.includes(y) ? cities.indexOf(y) : 99) || x.localeCompare(y));
@@ -57,6 +59,7 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
   function set(patch: BrowseSearch) {
     const next: BrowseSearch = { ...search, ...patch };
     if ("medium" in patch) delete next.specialty;
+    if ('medium' in patch || 'specialty' in patch) delete next.service;
     for (const k of Object.keys(next) as (keyof BrowseSearch)[]) if (!next[k]) delete next[k];
     if (next.tab === "art") delete next.tab;
     if (next.sort === "recommended") delete next.sort;
@@ -97,8 +100,10 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
   const artists = data.artists.filter((a) => artistMatches(a.id) && (!city || a.city === city));
   const services = data.services.filter(
     (s) =>
-      (!medium || s.medium_id === medium.id) &&
-      (!specialty || s.specialty_ids.includes(specialty.id)) &&
+      (!s.service_type_id || activeEntries(rows, 'service').some(t => t.id === s.service_type_id)) &&
+      (!serviceType || s.service_type_id === serviceType.id) &&
+      (!medium || (s.service_type_id ? serviceTaxonomy(rows, s.service_type_id).medium_id : s.medium_id) === medium.id) &&
+      (!specialty || (s.service_type_id ? serviceTaxonomy(rows, s.service_type_id).specialty_ids : s.specialty_ids).includes(specialty.id)) &&
       (!city || artistCity(s.artist) === city),
   );
   const events = data.events.filter((e) => artistMatches(data.artists.find(a=>a.handle===e.artist)?.id??e.artist) && (!city || e.city === city));
@@ -128,11 +133,12 @@ export function TaxonomyBrowse({ fixed }: { fixed?: Fixed }) {
           </QButton>
         ))}
       </div>
-      <div className={`mt-6 grid grid-cols-2 gap-3 ${tab === "art" ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+      <div className={`mt-6 grid grid-cols-2 gap-3 ${tab === "art" || tab === 'services' ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {selector(c.mediums, medium?.slug ?? "", (v) => set({ medium: v }), mediumOptions)}
         
         {selector(c.city, city, (v) => set({ city: v }), cityOptions.map((x) => ({ id: x, label: f.city(x) })))}
         {tab === "art" && selector(c.sortBy, sort, (v) => set({ sort: v as SortKey }), sortKeys.map((k) => ({ id: k, label: sortLabels[k] })), false)}
+        {tab === 'services' && selector(serviceTypeCopy[lang].type, serviceType?.slug ?? '', v => set({ service: v }), serviceTypes.map(t => ({ id: t.slug, label: label(t, lang) })))}
       </div>
       {medium&&<div className="mt-4 flex flex-wrap gap-2" aria-label={c.specialties}>{[{id:'',label:c.all},...specialtyOptions].map(o=><QButton key={o.id} className={`chip ${specialty?.slug===o.id||!specialty&&o.id===''?'chip-on':''}`} aria-pressed={specialty?.slug===o.id||!specialty&&o.id===''} onClick={()=>set({specialty:o.id})}>{o.label}</QButton>)}</div>}
       <div className="mt-8">

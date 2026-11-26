@@ -9,7 +9,7 @@ import { isForSale, type TaxonomyEntry } from "./taxonomy";
  * - Sort: recommended, popular, new, rated, price-asc, price-desc.
  * - State lives in the URL; medium and specialty use their English slugs there.
  */
-export const browseSearchValidator=zodValidator(z.object({medium:fallback(z.string(),'').optional(),specialty:fallback(z.string(),'').optional(),city:fallback(z.string(),'').optional(),sort:fallback(z.string(),'recommended').optional(),tab:fallback(z.string(),'art').optional()}));
+export const browseSearchValidator=zodValidator(z.object({medium:fallback(z.string(),'').optional(),specialty:fallback(z.string(),'').optional(),service:fallback(z.string(),'').optional(),city:fallback(z.string(),'').optional(),sort:fallback(z.string(),'recommended').optional(),tab:fallback(z.string(),'art').optional()}));
 export const browseTabs = ["art", "artists", "services", "events"] as const;
 export type BrowseTab = (typeof browseTabs)[number];
 export const sortKeys = ["recommended", "popular", "new", "rated", "price-asc", "price-desc"] as const;
@@ -19,6 +19,7 @@ export type BrowseSearch = {
   tab?: BrowseTab;
   medium?: string;
   specialty?: string;
+  service?: string;
   city?: string;
   sort?: SortKey;
 };
@@ -36,6 +37,8 @@ export function parseBrowseSearch(s: Record<string, unknown>): BrowseSearch {
   if (medium) out.medium = medium;
   const specialty = text(s["specialty"]);
   if (specialty) out.specialty = specialty;
+  const service = text(s['service']);
+  if (service) out.service = service;
   const city = text(s["city"]);
   if (city) out.city = city;
   const sort = pick(s["sort"], sortKeys);

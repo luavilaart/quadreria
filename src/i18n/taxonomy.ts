@@ -1,11 +1,11 @@
 export type Language = 'en' | 'es';
 export const mediumCatalog = [
  ['painting','pintura','Painting','Pintura',[
- ['oil','oleo','Oil','Óleo'],['acrylic','acrilico','Acrylic','Acrílico'],['watercolor','acuarela','Watercolor','Acuarela'],['gouache','gouache','Gouache','Gouache'],['mural','mural','Mural','Mural'],['street-art-graffiti','arte-urbano-grafiti','Street art & graffiti','Arte urbano y grafiti'],['mixed-media','tecnica-mixta','Mixed media','Técnica mixta']]],
+ ['oil','oleo','Oil','Óleo'],['acrylic','acrilico','Acrylic','Acrílico'],['watercolor','acuarela','Watercolor','Acuarela'],['gouache','gouache','Gouache','Gouache'],['mural','mural','Murals & muralism','Murales y muralismo'],['street-art-graffiti','arte-urbano-grafiti','Street art & graffiti','Arte urbano y grafiti'],['mixed-media','tecnica-mixta','Mixed media','Técnica mixta']]],
  ['drawing-illustration','dibujo-ilustracion','Drawing & illustration','Dibujo e ilustración',[
  ['pencil-charcoal','lapiz-carboncillo','Pencil & charcoal','Lápiz y carboncillo'],['ink','tinta','Ink','Tinta'],['illustration','ilustracion','Illustration','Ilustración'],['comics-zines','comics-fanzines','Comics & zines','Cómics y fanzines'],['childrens-books','libros-infantiles',"Children's books",'Libros infantiles'],['printmaking','grabado-serigrafia','Printmaking','Grabado y serigrafía']]],
  ['digital-art-design','arte-digital-diseno','Digital art & design','Arte digital y diseño',[
- ['digital-illustration','ilustracion-digital','Digital illustration','Ilustración digital'],['digital-painting','pintura-digital','Digital painting','Pintura digital'],['3d','3d','3D','3D'],['pixel-art','pixel-art','Pixel art','Pixel art'],['logo-branding','logo-marca','Logo & branding','Logo y marca'],['graphic-design','diseno-grafico','Graphic design','Diseño gráfico'],['lettering-typography','lettering-tipografia','Lettering & typography','Lettering y tipografía'],['packaging','empaque','Packaging','Empaque']]],
+ ['digital-illustration','ilustracion-digital','Digital illustration','Ilustración digital'],['digital-painting','pintura-digital','Digital painting','Pintura digital'],['3d','3d','3D','3D'],['pixel-art','pixel-art','Pixel art','Pixel art'],['logo-branding','logo-marca','Logo & branding','Logo y marca'],['graphic-design','diseno-grafico','Graphic design','Diseño gráfico'],['lettering-typography','lettering-tipografia','Lettering & typography','Lettering y tipografía'],['packaging','empaque','Packaging','Empaque'],['web-design','diseno-web','Web design','Diseño web'],['ux-ui-design','diseno-ux-ui','UX/UI design','Diseño UX/UI']]],
  ['photography','fotografia','Photography','Fotografía',[
  ['portrait','retrato','Portrait','Retrato'],['events-weddings','eventos-y-bodas','Events & weddings','Eventos y bodas'],['product','producto','Product','Producto'],['fine-art','fotografia-artistica','Fine art','Fotografía artística'],['documentary','documental','Documentary','Documental'],['film-analog','analogica','Film & analog','Analógica']]],
  ['film-video-animation','cine-video-animacion','Film, video & animation','Cine, video y animación',[
@@ -17,7 +17,7 @@ export const mediumCatalog = [
  ['textile-fiber','textil-fibra','Textile & fiber','Textil y fibra',[
  ['crochet-knitting','crochet-tejido','Crochet & knitting','Crochet y tejido'],['embroidery','bordado','Embroidery','Bordado'],['weaving','telar','Weaving','Telar'],['macrame','macrame','Macramé','Macramé'],['fashion-clothing','moda-ropa','Fashion & clothing','Moda y ropa']]],
  ['body-art','arte-corporal','Body art','Arte corporal',[
- ['tattoo','tatuaje','Tattoo','Tatuaje'],['piercing','piercing','Piercing','Piercing'],['makeup','maquillaje','Makeup','Maquillaje']]],
+ ['tattoo','tatuaje','Tattoo','Tatuaje'],['piercing','piercing','Piercing','Piercing'],['makeup','maquillaje','Makeup','Maquillaje'],['nail-art','arte-unas','Nail art','Arte de uñas']]],
  ['writing','escritura','Writing','Escritura',[
  ['poetry','poesia','Poetry','Poesía'],['fiction','ficcion','Fiction','Ficción'],['essay-nonfiction','ensayo-no-ficcion','Essay & nonfiction','Ensayo y no ficción'],['screenwriting','guion','Screenwriting','Guion']]],
 ] as const;
@@ -33,3 +33,34 @@ export const taxonomyCopy = {
 };
 
 export const taxonomyIntro = (en:string,es:string)=>({intro_en:`Explore ${en.toLowerCase()} and meet independent artists on quadreria.`,intro_es:`Explorá ${es.toLowerCase()} y conocé artistas independientes en quadreria.`});
+
+export const artistSpecialtyCopy = { en: { mural: 'Muralist' }, es: { mural: 'Muralista' } };
+export const serviceTypeCopy = { en: { types: 'Service types', type: 'Service type', untyped: 'Other service', linked: 'Medium / specialty' }, es: { types: 'Tipos de servicio', type: 'Tipo de servicio', untyped: 'Otro servicio', linked: 'Medio / especialidad' } };
+/** Service types use the same bilingual entry shape; the final value is their canonical taxonomy parent. */
+export const serviceCatalog = [
+ ['video-editing','edicion-video','Video editing','Edición de video','medium:film-video-animation:video-editing'],
+ ['web-design','diseno-web','Web design','Diseño web','medium:digital-art-design:web-design'],
+ ['ux-ui-design','diseno-ux-ui','UX/UI design','Diseño UX/UI','medium:digital-art-design:ux-ui-design'],
+ ['logo-branding','logo-marca','Logo & branding','Logo y marca','medium:digital-art-design:logo-branding'],
+ ['social-media-content','contenido-redes-sociales','Social media content','Contenido para redes sociales','medium:digital-art-design:graphic-design'],
+ ['illustration-commissions','ilustraciones-encargo','Illustration commissions','Ilustraciones por encargo','medium:drawing-illustration:illustration'],
+ ['portrait-commissions','retratos-encargo','Portrait commissions','Retratos por encargo','medium:painting'],
+ ['mural-painting','pintura-murales','Mural painting','Pintura de murales','medium:painting:mural'],
+ ['photo-sessions','sesiones-fotos','Photo sessions','Sesiones de fotos','medium:photography:portrait'],
+ ['event-wedding-photography','fotografia-eventos-bodas','Event & wedding photography','Fotografía de eventos y bodas','medium:photography:events-weddings'],
+ ['videography','videografia','Videography','Videografía','medium:film-video-animation:videography'],
+ ['animation','animacion','Animation','Animación','medium:film-video-animation:animation'],
+ ['music-production-beats','produccion-musical-beats','Music production & beats','Producción musical y beats','medium:music-sound:producer-beats'],
+ ['mixing-mastering','mezcla-masterizacion','Mixing & mastering','Mezcla y masterización','medium:music-sound:producer-beats'],
+ ['live-music-dj','musica-vivo-dj','Live music & DJ for events','Música en vivo y DJ para eventos','medium:music-sound:dj'],
+ ['tattoo','tatuaje','Tattoo','Tatuaje','medium:body-art:tattoo'],
+ ['nail-art','arte-unas','Nail art','Arte de uñas','medium:body-art:nail-art'],
+ ['makeup','maquillaje','Makeup','Maquillaje','medium:body-art:makeup'],
+ ['custom-pieces-commissions','piezas-personalizadas-encargos','Custom pieces & commissions (ceramics, textile, jewelry)','Piezas personalizadas y encargos','medium:sculpture-objects'],
+ ['classes-workshops','clases-talleres','Classes & workshops','Clases y talleres','medium:textile-fiber'],
+ ['writing-copywriting-translation','redaccion-copywriting-traduccion','Writing, copywriting & translation','Redacción, copywriting y traducción','medium:writing'],
+] as const;
+export const sampleServiceCopy = {
+ en: { video: { title: 'A short film, beautifully edited', note: 'Video editing for a short film or social clip.' }, web: { title: 'A website with your own character', note: 'Web design for an independent artist or small project.' } },
+ es: { video: { title: 'Tu cortometraje, bien editado', note: 'Edición de video para un cortometraje o clip para redes.' }, web: { title: 'Un sitio web con tu propio carácter', note: 'Diseño web para artistas independientes o proyectos pequeños.' } },
+};
